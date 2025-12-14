@@ -9,10 +9,27 @@ const stripe = require("stripe")(process.env.STRIPE_SECRET_KEY);
 let userCollection;
 const asyncHandler = require("./asyncHandler");
 const errorHandler = require("./errorHandler");
+const nodemailer = require("nodemailer");
+
+const emailTransporter = nodemailer.createTransport({
+  service: "gmail",
+  auth: {
+    user: process.env.CAFE_AZIZ_EMAIL,
+    pass: process.env.CAFE_AZIZ_EMAIL_PASS,
+  },
+});
+
 // MiddleWare
+app.use(
+  cors({
+    origin: [
+      "http://localhost:5173",
+      "https://bistro-boss-restaurant-kaptai.web.app",
+    ],
+  })
+);
 app.use(cors());
 app.use(express.json());
-app.use(errorHandler);
 
 /* -----Custom Middlewares Start */
 const verifyToken = (req, res, next) => {
@@ -114,14 +131,19 @@ async function run() {
       })
     );
 
-    app.patch("/users/admin/:id", verifyToken, async (req, res) => {
-      res.send(
-        await userCollection.updateOne(
-          { _id: new ObjectId(req.params.id) },
-          { $set: { role: "admin" } }
-        )
-      );
-    });
+    app.patch(
+      "/users/admin/:id",
+      verifyToken,
+      verifyAdmin,
+      async (req, res) => {
+        res.send(
+          await userCollection.updateOne(
+            { _id: new ObjectId(req.params.id) },
+            { $set: { role: "admin" } }
+          )
+        );
+      }
+    );
 
     app.delete(
       "/users/:id",
@@ -251,7 +273,6 @@ async function run() {
       const query = { _id: new ObjectId(id) };
       const result = await cartCollection.deleteOne(query);
       res.send(result);
-      res.send([]);
     });
     /**
      * Cart Collection End
@@ -260,6 +281,10 @@ async function run() {
     /* ____---Payment Start---______ */
 
     app.post("/orderedItems", verifyToken, async (req, res) => {
+      if (!Array.isArray(req.body.ids) || req.body.ids.length === 0) {
+        return res.status(400).send({ message: "Invalid request" });
+      }
+
       const ids = req.body.ids.map((id) => new ObjectId(id));
       const result = await menuCollection.find({ _id: { $in: ids } }).toArray();
       res.send(result);
@@ -281,18 +306,62 @@ async function run() {
     });
 
     app.post("/payment", verifyToken, async (req, res) => {
-      const payment = { ...req.body, createdAt: new Date() };
-      const cartIds = payment.cartItemIds;
-      const filter = {
-        _id: { $in: cartIds.map((id) => new ObjectId(id)) },
-      };
+      try {
+        const { email, transactionId, price, cartItemIds } = req.body;
+        const payment = { ...req.body, createdAt: new Date() };
 
-      const deleteResult = await cartCollection.deleteMany(filter);
-      const paymentInsertResult = await paymentCollection.insertOne(payment);
-      res.send({ paymentInsertResult, deleteResult });
+        const paymentInsertResult = await paymentCollection.insertOne(payment);
+
+        const filter = {
+          _id: { $in: cartItemIds.map((id) => new ObjectId(id)) },
+        };
+        const deleteResult = await cartCollection.deleteMany(filter);
+
+        /* 
+       const emailObj = {
+         from: `"Cafe Aziz" <${process.env.CAFE_AZIZ_EMAIL}>`,
+         to: email,
+         subject: "Cafe Aziz - Order Confirmation",
+         html: `
+        <div style="font-family: Arial, sans-serif; line-height: 1.6; color: #333;">
+          <h2>Thank you for your payment!</h2>
+          <p>We have successfully received your payment for your recent order.</p>
+          <hr />
+          <p><strong>Transaction ID:</strong> ${transactionId}</p>
+          <p><strong>Total Paid:</strong> $${price}</p>
+          <hr />
+          <p>If you face any issues, please reply to this email.</p>
+          <p>Warm regards,<br/>Cafe Aziz Team</p>
+        </div>
+      `,
+       }; */
+
+        // 4️⃣ Send confirmation email
+        /*  try {
+         const emailInfo = await emailTransporter.sendMail(emailObj);
+         console.log("Email sent successfully:", emailInfo.messageId);
+       } catch (emailError) {
+         console.error("Error sending email:", emailError);
+       } */
+
+        // 5️⃣ Respond to frontend
+        res.send({
+          success: true,
+          message: "Payment processed successfully",
+          paymentInsertResult,
+          deleteResult,
+        });
+      } catch (err) {
+        console.error("Payment processing error:", err);
+        res.status(500).send({
+          success: false,
+          message: "Failed to process payment",
+          error: err.message,
+        });
+      }
     });
 
-    app.post("/create-payment-intent", async (req, res) => {
+    app.post("/create-payment-intent", verifyToken, async (req, res) => {
       const { price } = req?.body;
       const amountInCents = Math.round(price * 100);
       const paymentIntent = await stripe.paymentIntents.create({
@@ -326,11 +395,53 @@ async function run() {
       res.send({ users, menuItems, orders, revenue });
     });
 
+    // used aggregate pipeline
+    app.get("/order-stats", verifyToken, verifyAdmin, async (req, res) => {
+      const result = await paymentCollection
+        .aggregate([
+          { $unwind: "$menuItemIds" },
+          {
+            $addFields: {
+              menuItemIds: { $toObjectId: "$menuItemIds" },
+            },
+          },
+          {
+            $lookup: {
+              from: "menu",
+              localField: "menuItemIds",
+              foreignField: "_id",
+              as: "menuItem",
+            },
+          },
+          { $unwind: "$menuItem" },
+
+          // Now group by category
+          {
+            $group: {
+              _id: "$menuItem.category",
+              quantity: { $sum: 1 },
+              revenue: { $sum: "$menuItem.price" },
+            },
+          },
+          {
+            $project: {
+              _id: 0,
+              category: "$_id",
+              quantity: 1,
+              revenue: 1,
+            },
+          },
+        ])
+        .toArray();
+
+      res.send(result);
+    });
+
     /* ____---Payment End---______ */
 
-    console.log(
-      "Pinged your deployment. You successfully connected to MongoDB!"
-    );
+    // console.log(
+    //   "Pinged your deployment. You successfully connected to MongoDB!"
+    // );
   } finally {
   }
 }
@@ -341,7 +452,7 @@ run().catch(console.dir);
 app.get("/", (req, res) => {
   res.send("Bistro is being hyped");
 });
-
+app.use(errorHandler);
 app.listen(port, () => {
   console.log(`Bistro in firing`);
 });

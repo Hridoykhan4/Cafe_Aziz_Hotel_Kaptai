@@ -21,7 +21,7 @@ const GoogleLoginButton = ({ from }) => {
         email: result?.user?.email,
       };
       const { data } = await axiosPublic.post("/users", userInfo);
-      console.log(data);
+      // console.log(data);
       if (data?.insertedId) {
         Swal.fire({
           title: "Welcome 🎉",

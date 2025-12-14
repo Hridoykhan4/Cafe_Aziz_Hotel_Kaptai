@@ -54,7 +54,7 @@ const FoodCard = ({ item }) => {
           }
           refetch();
         } catch (err) {
-          console.log(err);
+          // console.log(err);
           if (err?.response?.data?.exists) {
             Swal.fire({
               title: "⚠️ Already Added",

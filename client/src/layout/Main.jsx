@@ -2,6 +2,7 @@ import { Outlet, useNavigation } from "react-router-dom";
 import Footer from "../pages/Shared/Footer/Footer";
 import Navbar from "../pages/Shared/Navbar/Navbar";
 import LoadingSpinner from "../components/LoadingSpinner";
+import { FaAirbnb } from "react-icons/fa";
 
 const Main = () => {
   const navigation = useNavigation();
@@ -19,6 +20,18 @@ const Main = () => {
           <Outlet></Outlet>
         )}
       </main>
+
+      <button
+        onClick={() => {
+          window.scrollTo({
+            top: 0,
+            behavior: "smooth",
+          });
+        }}
+        className="fixed bottom-10 right-4 w-12 h-12 flex justify-center items-center rounded-full bg-amber-600"
+      >
+        <FaAirbnb className="text-white z-[1000] font-semibold animate-bounce"></FaAirbnb>
+      </button>
 
       <footer>
         <Footer></Footer>

@@ -19,7 +19,6 @@ const CheckoutForm = () => {
     return cart.reduce((total, item) => total + item.price, 0);
   }, [cart]);
 
-  console.log(totalPrice);
 
   useEffect(() => {
     if (totalPrice > 0) {
@@ -30,8 +29,8 @@ const CheckoutForm = () => {
           });
           setClientSecret(data?.clientSecret);
         } catch (err) {
-          console.log(err);
-          setErrorMessage("Failed to initialize payment");
+        
+          setErrorMessage(`Failed to initialize payment: ${err?.message}`);
         }
       };
       createIntent();
@@ -44,10 +43,11 @@ const CheckoutForm = () => {
     setProcessing(true);
     setErrorMessage("");
     const card = elements.getElement(CardElement);
-    console.log(card);
+   
     if (!card) return;
 
     try {
+      // eslint-disable-next-line no-unused-vars
       const { error: methodError, paymentMethod } =
         await stripe.createPaymentMethod({
           type: "card",
@@ -55,11 +55,11 @@ const CheckoutForm = () => {
         });
 
       if (methodError) {
-        console.log("paymentMethod Error", methodError);
+        // console.log("paymentMethod Error", methodError);
         setErrorMessage(methodError?.message);
         return;
       }
-      console.log("[PaymentMethod]", paymentMethod);
+      // console.log("[PaymentMethod]", paymentMethod);
 
       // Confirm Payment
       const { error: cardIntentError, paymentIntent } =
@@ -87,7 +87,7 @@ const CheckoutForm = () => {
           status: "pending",
           cartItemIds: cart.map((item) => item._id),
           menuItemIds: cart.map((item) => item.menuId),
-          totalPrice,
+      
         };
         const { data } = await axiosSecure.post("/payment", payment);
         if (data?.paymentInsertResult?.insertedId) {
@@ -102,7 +102,7 @@ const CheckoutForm = () => {
         }
       }
     } catch (err) {
-      console.log(err);
+      // console.log(err);
       Swal.fire({
         icon: "error",
         title: "Payment Failed",

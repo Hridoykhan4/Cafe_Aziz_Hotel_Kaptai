@@ -22,7 +22,7 @@ const OrderItems = () => {
     return (
       <div className="grid grid-cols-1 md:grid-cols-2">
         {data?.map((item) => (
-          <div key={item._id} className="card bg-base-100 w-96 shadow-sm">
+          <div key={item._id} className="card bg-base-100 shadow-sm">
             <figure>
               <img src={item?.image} alt={item?.name} />
             </figure>

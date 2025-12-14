@@ -67,7 +67,7 @@ const AllUsers = () => {
     if (result.isConfirmed) {
       try {
         const { data } = await axiosSecure.patch(`/users/admin/${id}`);
-        console.log(data);
+        // console.log(data);
         if (data.modifiedCount) {
           refetch();
           Swal.fire({
@@ -78,7 +78,7 @@ const AllUsers = () => {
           });
         }
       } catch (err) {
-        console.log(err);
+        // console.log(err);
         Swal.fire({
           title: `${err?.message || "OOpps"}`,
           text: "Something went wrong.",

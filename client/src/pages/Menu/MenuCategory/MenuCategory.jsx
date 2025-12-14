@@ -7,18 +7,18 @@ const MenuCategory = ({ items, title, desc, coverImage }) => {
     <div>
       {title && <Cover img={coverImage} title={title} desc={desc}></Cover>}
 
-      <div className="grid w-11/12  sm:grid-cols-2 gap-8 my-4 max-w-7xl mx-auto px-4 sm:px-0">
+      <div className="grid w-11/12 mb-4 sm:grid-cols-2 gap-8 my-4 max-w-7xl mx-auto px-4 sm:px-0">
         {items?.map((item) => (
           <MenuItem item={item} key={item._id}></MenuItem>
         ))}
       </div>
 
       {title && (
-        <div className="mb-7 text-center">
+        <div className="mb-7 mt-8 text-center">
           <Link
             to={`/order/${title.toLowerCase()}`}
             className="
-          relative z-0
+          z-0
           bg-gradient-to-r from-amber-600 via-amber-500 to-amber-600 
           hover:from-amber-700 hover:via-amber-600 hover:to-amber-700
           border-0 text-white px-8 py-3 rounded-full 

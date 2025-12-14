@@ -18,6 +18,7 @@ import PaymentHistory from "../pages/Dashboard/Customer/PaymentHistory/PaymentHi
 import OrderItems from "../pages/Dashboard/Customer/PaymentHistory/OrderItems";
 import AdminHome from "../pages/Dashboard/Admin/AdminHome/AdminHome";
 import UserHome from "../pages/Dashboard/Customer/UserHome/UserHome";
+import ManageBookings from "../pages/Dashboard/Admin/ManageBookings/ManageBookings";
 
 const router = createBrowserRouter([
   {
@@ -51,8 +52,8 @@ const router = createBrowserRouter([
     ),
     children: [
       {
-        path: 'userHome',
-        element: <UserHome></UserHome>
+        path: "userHome",
+        element: <UserHome></UserHome>,
       },
       {
         path: "cart",
@@ -110,6 +111,14 @@ const router = createBrowserRouter([
         element: (
           <AdminRoute>
             <ItemFormPage mode="update"></ItemFormPage>
+          </AdminRoute>
+        ),
+      },
+      {
+        path: "manageBooking",
+        element: (
+          <AdminRoute>
+            <ManageBookings></ManageBookings>
           </AdminRoute>
         ),
       },

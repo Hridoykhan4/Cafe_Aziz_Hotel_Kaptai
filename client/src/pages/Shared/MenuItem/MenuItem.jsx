@@ -6,7 +6,7 @@ const MenuItem = ({ item }) => {
 
   return (
     <motion.div
-      className="flex items-center gap-6 p-4 rounded-2xl shadow-md bg-white hover:shadow-lg transition-all duration-300"
+      className="flex flex-col md:flex-row items-center gap-6 p-4 rounded-2xl shadow-md bg-white hover:shadow-lg transition-all duration-300"
       initial={{ opacity: 0, y: 60 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.9, ease: "easeOut", delay: 0.5 }}
@@ -23,12 +23,12 @@ const MenuItem = ({ item }) => {
       />
 
       {/* Text Section */}
-      <div className="flex-1">
-        <div className="flex items-center justify-between">
+      <div className="sm:flex-1">
+        <div className="flex items-center flex-wrap justify-between">
           <h2 className="uppercase font-semibold text-lg tracking-wide text-gray-800">
             {name}
           </h2>
-          <span className="text-amber-600 font-bold text-lg">${price}</span>
+        <span className="text-amber-600 font-bold text-lg">${price}</span>
         </div>
         <p className="text-gray-600 text-sm mt-2 leading-relaxed">{recipe}</p>
       </div>

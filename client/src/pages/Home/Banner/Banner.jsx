@@ -24,7 +24,7 @@ const Banner = () => {
         className="banner-carousel"
       >
         {images.map((src, index) => (
-          <div key={index} className="relative group  md:h-screen">
+          <div key={index} className="relative group h-[450px]  md:h-screen">
             <img
               src={src}
               alt={`Slide ${index + 1}`}

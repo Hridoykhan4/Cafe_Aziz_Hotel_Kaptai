@@ -67,13 +67,12 @@ const SignUp = () => {
       // Store user in database
       const userInfo = { name: data.name, email: data.email };
       const res = await axiosPublic.post("/users", userInfo);
-      console.log(cloud, res);
       if (res?.data?.insertedId) {
         Swal.fire({
           title: "Welcome 🎉",
           text: `Account created for ${data?.name || data?.email}`,
           icon: "success",
-          timer: 2000,
+          timer: 3000,
           showConfirmButton: false,
         });
         setUser({...user, displayName: data?.name, photoURL: cloud?.url})
@@ -82,7 +81,7 @@ const SignUp = () => {
         nav("/");
       }
     } catch (err) {
-      console.log(err);
+      // console.log(err);
       Swal.fire({
         title: "Registration failed ❌",
         text: err.message || "Something went wrong",

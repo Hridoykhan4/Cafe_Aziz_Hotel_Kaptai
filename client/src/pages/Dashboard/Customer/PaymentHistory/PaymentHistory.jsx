@@ -18,7 +18,7 @@ const PaymentHistory = () => {
     queryKey: ["payment", user?.email],
     queryFn: async () => {
       const { data } = await axiosSecure.get(`/payments?email=${user?.email}`);
-      console.log(data);
+      // console.log(data);
       return data;
     },
     enabled: !!user && !loading,
@@ -78,11 +78,11 @@ const PaymentHistory = () => {
             ))}
           </tbody>
         </table>
+      </div>
 
         <div className="mt-10">
           <Outlet></Outlet>
         </div>
-      </div>
     </div>
   );
 };

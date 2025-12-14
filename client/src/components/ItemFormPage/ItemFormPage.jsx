@@ -95,7 +95,7 @@ const ItemFormPage = ({ mode = "add" }) => {
           }
         }
       } catch (err) {
-        console.log(err);
+        // console.log(err);
         Swal.fire({
           title: isUpdate ? "Update failed" : "Add failed",
           text: err.message || "Something went wrong",
