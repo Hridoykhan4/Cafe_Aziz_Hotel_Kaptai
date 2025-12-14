@@ -3,10 +3,15 @@ import useAuthValue from "../../../../hooks/useAuthValue";
 import useAxiosSecure from "../../../../hooks/useAxiosSecure";
 import LoadingSpinner from "../../../../components/LoadingSpinner";
 import SectionTitle from "../../../../components/SectionTitle/SectionTitle";
-import { FaArrowRight } from "react-icons/fa";
-import { Link, Outlet } from "react-router-dom";
+import { FaArrowRight, FaCross } from "react-icons/fa";
+import { Link, Outlet, useLocation } from "react-router-dom";
+import { FcCancel } from "react-icons/fc";
+import { useState } from "react";
 
 const PaymentHistory = () => {
+  const location = useLocation();
+  const isOpen = location.pathname.includes("menuIds");
+  const [isOpenMatchedId, setIdOpenMatchedId] = useState(null);
   const { user, loading } = useAuthValue();
   const axiosSecure = useAxiosSecure();
   const { data: payments = [], isPending } = useQuery({
@@ -53,18 +58,27 @@ const PaymentHistory = () => {
                   {new Date(history?.createdAt).toLocaleDateString("en-US")}
                 </td>
                 <td>{history?.menuItemIds?.length}</td>
-                <td>
+                <td onClick={() => setIdOpenMatchedId(history._id)}>
                   <Link
                     className="btn"
-                    to={`menuIds?ids=${history?.menuItemIds.join(",")}`}
+                    to={
+                      isOpen
+                        ? "/dashboard/payment_history"
+                        : `menuIds?ids=${history.menuItemIds.join(",")}`
+                    }
                   >
-                    <FaArrowRight className="text-sky-700 text-lg"></FaArrowRight>
+                    {isOpen && history._id === isOpenMatchedId ? (
+                      <FcCancel></FcCancel>
+                    ) : (
+                      <FaArrowRight className="text-sky-700 text-lg"></FaArrowRight>
+                    )}
                   </Link>
                 </td>
               </tr>
             ))}
           </tbody>
         </table>
+
         <div className="mt-10">
           <Outlet></Outlet>
         </div>

@@ -17,7 +17,7 @@ const OrderItems = () => {
         enabled: !!ids?.length
     })
 
-    console.log(data);
+ 
     if(isLoading) return <LoadingSpinner></LoadingSpinner>
     return (
       <div className="grid grid-cols-1 md:grid-cols-2">

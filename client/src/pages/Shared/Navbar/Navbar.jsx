@@ -3,15 +3,16 @@ import { useState } from "react";
 // eslint-disable-next-line no-unused-vars
 import { motion } from "motion/react";
 import Swal from "sweetalert2";
-import { FaShoppingCart } from "react-icons/fa";
+import { FaHome, FaShoppingCart } from "react-icons/fa";
 import useAuthValue from "../../../hooks/useAuthValue";
 import useCart from "../../../hooks/useCart";
+import useAdmin from "../../../hooks/useAdmin";
 
 const Navbar = () => {
   const { user, logOut } = useAuthValue();
   const { cart } = useCart();
   const [open, setOpen] = useState(false);
-  // console.log(user);
+  const { isAdmin } = useAdmin();
   const navLinkBase =
     "px-4 py-2 font-semibold transition duration-300 rounded-md";
   const navLinkActive = "text-green-400 font-bold border-b-2 border-green-400";
@@ -99,23 +100,39 @@ const Navbar = () => {
         </NavLink>
       </li>
 
-      <li>
-        <NavLink
-          to="/dashboard/cart"
-          className={({ isActive }) =>
-            `${navLinkBase} ${isActive ? navLinkActive : navLinkDefault}`
-          }
-        >
-          <div className="relative flex items-center gap-2">
-            <FaShoppingCart className="text-lg" />
-            <div className="badge badge-secondary text-xs">+{cart?.length}</div>
+      {user && isAdmin ? (
+        <li className="flex">
+          <NavLink
+            to="/dashboard/adminHome"
+            className={({ isActive }) =>
+              `${navLinkBase} ${isActive ? navLinkActive : navLinkDefault}`
+            }
+          >
+            {/* <FaHome /> */}
+            Dashboard
+          </NavLink>
+        </li>
+      ) : (
+        <li>
+          <NavLink
+            to="/dashboard/cart"
+            className={({ isActive }) =>
+              `${navLinkBase} ${isActive ? navLinkActive : navLinkDefault}`
+            }
+          >
+            <div className="relative flex items-center gap-2">
+              <FaShoppingCart className="text-lg" />
+              <div className="badge badge-secondary text-xs">
+                +{cart?.length}
+              </div>
 
-            {cart?.length > 0 && (
-              <span className="absolute -right-2 -top-2 h-2 w-2 bg-green-400 rounded-full animate-ping"></span>
-            )}
-          </div>
-        </NavLink>
-      </li>
+              {cart?.length > 0 && (
+                <span className="absolute -right-2 -top-2 h-2 w-2 bg-green-400 rounded-full animate-ping"></span>
+              )}
+            </div>
+          </NavLink>
+        </li>
+      )}
 
       {user ? (
         <div className="dropdown dropdown-end">

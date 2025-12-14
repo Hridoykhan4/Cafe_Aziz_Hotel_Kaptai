@@ -259,12 +259,11 @@ async function run() {
 
     /* ____---Payment Start---______ */
 
-    app.post("/orderedItems", verifyToken, async(req, res) => {
-      const ids = req.body.ids.map(id => new ObjectId(id));
-      const result = await menuCollection.find({_id: {$in:ids }}).toArray()
-      res.send(result)
+    app.post("/orderedItems", verifyToken, async (req, res) => {
+      const ids = req.body.ids.map((id) => new ObjectId(id));
+      const result = await menuCollection.find({ _id: { $in: ids } }).toArray();
+      res.send(result);
     });
-
 
     app.get("/payments", verifyToken, verifyValidEmail, async (req, res) => {
       const result = await paymentCollection
@@ -305,6 +304,26 @@ async function run() {
       res.send({
         clientSecret: paymentIntent.client_secret,
       });
+    });
+
+    app.get("/admin-stats", verifyToken, verifyAdmin, async (req, res) => {
+      const [users, menuItems, orders, revenueAgg] = await Promise.all([
+        userCollection.estimatedDocumentCount(),
+        menuCollection.estimatedDocumentCount(),
+        paymentCollection.estimatedDocumentCount(),
+        paymentCollection
+          .aggregate([
+            {
+              $group: {
+                _id: null,
+                totalRevenue: { $sum: "$price" },
+              },
+            },
+          ])
+          .toArray(),
+      ]);
+      const revenue = revenueAgg[0]?.totalRevenue || 0;
+      res.send({ users, menuItems, orders, revenue });
     });
 
     /* ____---Payment End---______ */

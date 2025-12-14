@@ -1,9 +1,9 @@
 import { Helmet } from "react-helmet-async";
 import { Tab, Tabs, TabList, TabPanel } from "react-tabs";
-import "react-tabs/style/react-tabs.css";
-
 import { useEffect, useMemo, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
+// eslint-disable-next-line no-unused-vars
+import { motion } from "framer-motion";
 
 import Cover from "../../Shared/Cover/Cover";
 import useMenu from "../../../hooks/useMenu";
@@ -20,29 +20,31 @@ import "swiper/css/navigation";
 
 const categories = ["salad", "pizza", "soup", "dessert", "drinks"];
 
-// Utility: split array into N-size chunks
 const chunkArray = (arr, size) =>
-  [...Array(Math.ceil(arr.length / size))].map((_, i) =>
+  Array.from({ length: Math.ceil(arr.length / size) }, (_, i) =>
     arr.slice(i * size, i * size + size)
   );
 
+const fadeUp = {
+  hidden: { opacity: 0, y: 30 },
+  visible: { opacity: 1, y: 0 },
+};
+
 const Order = () => {
-  const nav = useNavigate();
+  const navigate = useNavigate();
   const { category } = useParams();
   const { menu } = useMenu();
 
-  /** Determine tab from URL */
+  /* Active tab from URL */
   const initialTab = categories.indexOf(category);
   const [tabIndex, setTabIndex] = useState(initialTab >= 0 ? initialTab : 0);
 
-  /** Sync tab when URL changes */
   useEffect(() => {
     const idx = categories.indexOf(category);
-    if (idx === -1) return;
-    setTabIndex(idx);
+    if (idx !== -1) setTabIndex(idx);
   }, [category]);
 
-  /** Group menu by category */
+  /* Group menu by category */
   const categorizedMenu = useMemo(() => {
     const grouped = Object.fromEntries(categories.map((c) => [c, []]));
     menu.forEach((item) => {
@@ -51,97 +53,106 @@ const Order = () => {
     return grouped;
   }, [menu]);
 
-  /** Handle tab switch + sync URL */
+  /* Sync tab + URL */
   const handleTabSelect = (index) => {
     setTabIndex(index);
-    nav(`/order/${categories[index]}`);
+    navigate(`/order/${categories[index]}`);
   };
 
-  /** Desktop autoplay only */
-  const autoplaySettings = useMemo(
-    () =>
-      window.innerWidth > 768
-        ? {
-            delay: 3000,
-            disableOnInteraction: false,
-            pauseOnMouseEnter: true,
-          }
-        : false,
-    []
-  );
+  /* Desktop autoplay only */
+  const autoplay =
+    typeof window !== "undefined" && window.innerWidth > 768
+      ? { delay: 3000, disableOnInteraction: false }
+      : false;
 
   return (
-    <section>
+    <section className="bg-base-100">
       <Helmet>
         <title>Cafe Aziz | Order</title>
       </Helmet>
 
-      {/* Header Cover */}
+      {/* HERO */}
       <Cover
         img={orderCover}
-        title="Order Food"
-        desc="Your cravings, delivered hot & fresh!"
+        title="Order Your Favorite Food"
+        desc="Freshly prepared, fast delivered, unforgettable taste"
       />
 
-      {/* Intro Section */}
-      <div className="max-w-3xl mx-auto text-center px-6 mt-10">
-        <h2 className="text-4xl font-bold tracking-tight mb-4">
-          🍴 Choose. Click. Enjoy.
+      {/* INTRO */}
+      <motion.div
+        variants={fadeUp}
+        initial="hidden"
+        animate="visible"
+        transition={{ duration: 0.6 }}
+        className="max-w-3xl mx-auto text-center px-6 mt-14"
+      >
+        <h2 className="text-4xl font-extrabold tracking-tight mb-4">
+          🍽 Pick a Category & Order
         </h2>
         <p className="text-gray-600 text-lg leading-relaxed">
-          Explore our delicious categories and pick your favorites — freshly
-          made and ready to serve.
+          From healthy salads to cheesy pizzas — everything is crafted with
+          quality ingredients and love.
         </p>
-      </div>
+      </motion.div>
 
-      {/* Tabs Section */}
-      <div className="max-w-7xl mx-auto px-6 my-12">
+      {/* TABS */}
+      <div className="max-w-7xl mx-auto px-6 my-14">
         <Tabs selectedIndex={tabIndex} onSelect={handleTabSelect}>
-          <TabList className="flex flex-col sm:flex-row justify-center gap-4 sm:gap-6 border-b pb-4">
+          <TabList className="flex flex-wrap justify-center gap-4 border-b pb-5">
             {categories.map((c) => (
               <Tab
                 key={c}
-                className="px-6 py-2 text-lg rounded-lg cursor-pointer capitalize transition
-                           duration-300  font-medium"
-                selectedClassName="bg-indigo-600 text-white shadow-md"
+                className="px-6 py-2 rounded-full cursor-pointer capitalize font-semibold
+                           text-gray-600 border border-gray-200
+                           hover:bg-green-50 hover:text-green-600
+                           transition-all duration-300"
+                selectedClassName="bg-green-600 text-white border-green-600 shadow-md"
               >
                 {c}
               </Tab>
             ))}
           </TabList>
 
-          {/* Panels for each category */}
+          {/* PANELS */}
           {categories.map((c) => {
             const items = categorizedMenu[c];
             const slides = chunkArray(items, 6);
 
             return (
               <TabPanel key={c}>
-                {items.length === 0 ? (
-                  <p className="text-center text-gray-500 italic mt-6">
-                    No items available
-                  </p>
-                ) : (
-                  <Swiper
-                    modules={[Pagination, Autoplay, Navigation]}
-                    navigation
-                    pagination={{ type: "fraction", clickable: true }}
-                    autoplay={autoplaySettings}
-                    loop={items.length > 6} 
-                    spaceBetween={30}
-                    className="mt-10"
-                  >
-                    {slides.map((group, idx) => (
-                      <SwiperSlide key={idx}>
-                        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6 ">
-                          {group.map((item) => (
-                            <FoodCard key={item._id} item={item} />
-                          ))}
-                        </div>
-                      </SwiperSlide>
-                    ))}
-                  </Swiper>
-                )}
+                <motion.div
+                  variants={fadeUp}
+                  initial="hidden"
+                  whileInView="visible"
+                  viewport={{ once: true }}
+                  transition={{ duration: 0.5 }}
+                >
+                  {items.length === 0 ? (
+                    <p className="text-center text-gray-400 italic mt-10">
+                      No items available in this category
+                    </p>
+                  ) : (
+                    <Swiper
+                      modules={[Pagination, Autoplay, Navigation]}
+                      navigation
+                      pagination={{ clickable: true }}
+                      autoplay={autoplay}
+                      loop={items.length > 6}
+                      spaceBetween={30}
+                      className="mt-12"
+                    >
+                      {slides.map((group, idx) => (
+                        <SwiperSlide key={idx}>
+                          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
+                            {group.map((item) => (
+                              <FoodCard key={item._id} item={item} />
+                            ))}
+                          </div>
+                        </SwiperSlide>
+                      ))}
+                    </Swiper>
+                  )}
+                </motion.div>
               </TabPanel>
             );
           })}

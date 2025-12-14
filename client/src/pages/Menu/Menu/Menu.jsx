@@ -1,16 +1,22 @@
 import { Helmet } from "react-helmet-async";
+// eslint-disable-next-line no-unused-vars
+import { motion } from "framer-motion";
 import Cover from "../../Shared/Cover/Cover";
-import menuImg from "../../../assets/menu/banner3.jpg";
 import SectionTitle from "../../../components/SectionTitle/SectionTitle";
-import useMenu from "../../../hooks/useMenu";
 import MenuCategory from "../MenuCategory/MenuCategory";
+import useMenu from "../../../hooks/useMenu";
+import useScrollTo from "../../../hooks/useScrollTo";
 
-// Category background images
+import menuImg from "../../../assets/menu/banner3.jpg";
 import dessertBg from "../../../assets/menu/dessert-bg.jpeg";
 import soupBg from "../../../assets/menu/soup-bg.jpg";
 import saladBg from "../../../assets/menu/salad-bg.jpg";
 import pizzaBg from "../../../assets/menu/pizza-bg.jpg";
-import useScrollTo from "../../../hooks/useScrollTo";
+
+const fadeUp = {
+  hidden: { opacity: 0, y: 30 },
+  visible: { opacity: 1, y: 0 },
+};
 
 const Menu = () => {
   useScrollTo();
@@ -19,25 +25,25 @@ const Menu = () => {
   const categories = [
     {
       key: "dessert",
-      title: "Dessert",
+      title: "Desserts",
       desc: "Sweet delights to end your meal with a smile",
       coverImage: dessertBg,
     },
     {
       key: "soup",
-      title: "Soup",
+      title: "Soups",
       desc: "Warm, comforting, and full of flavor",
       coverImage: soupBg,
     },
     {
       key: "salad",
-      title: "Salad",
+      title: "Salads",
       desc: "Fresh, healthy, and crunchy bites",
       coverImage: saladBg,
     },
     {
       key: "pizza",
-      title: "Pizza",
+      title: "Pizzas",
       desc: "Cheesy, crispy, and baked to perfection",
       coverImage: pizzaBg,
     },
@@ -52,33 +58,58 @@ const Menu = () => {
     }, {}) || {};
 
   return (
-    <section>
+    <section className="bg-base-100">
       <Helmet>
         <title>Bistro | Menu</title>
       </Helmet>
 
-      {/* Main Hero Cover */}
+      {/* HERO */}
       <Cover
         img={menuImg}
         title="Our Menu"
-        desc="Would you like to try a dish ?"
+        desc="Discover flavors crafted with passion"
       />
 
-      {/* Today's Offer Section */}
-      <SectionTitle
-        subHeading="---Don't miss---"
-        heading="🔥 Today's Offer 🔥"
-      />
-      <MenuCategory items={categorizedMenu["offered"] || []} />
+      {/* TODAY'S OFFER */}
+      <motion.div
+        variants={fadeUp}
+        initial="hidden"
+        whileInView="visible"
+        viewport={{ once: true }}
+        transition={{ duration: 0.6 }}
+        className="container mx-auto px-4"
+      >
+        <SectionTitle
+          subHeading="---Don't miss---"
+          heading="🔥 Today's Offer"
+        />
 
-      {categories?.map(({ key, title, desc, coverImage }) => (
-        <MenuCategory
+        {categorizedMenu["offered"]?.length ? (
+          <MenuCategory items={categorizedMenu["offered"]} />
+        ) : (
+          <p className="text-center text-gray-400 py-10">
+            No offers available today
+          </p>
+        )}
+      </motion.div>
+
+      {/* CATEGORY SECTIONS */}
+      {categories.map(({ key, title, desc, coverImage }) => (
+        <motion.div
           key={key}
-          title={title}
-          desc={desc}
-          coverImage={coverImage}
-          items={categorizedMenu[key] || []}
-        ></MenuCategory>
+          variants={fadeUp}
+          initial="hidden"
+          whileInView="visible"
+          viewport={{ once: true }}
+          transition={{ duration: 0.6 }}
+        >
+          <MenuCategory
+            title={title}
+            desc={desc}
+            coverImage={coverImage}
+            items={categorizedMenu[key] || []}
+          />
+        </motion.div>
       ))}
     </section>
   );
