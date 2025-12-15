@@ -290,10 +290,29 @@ async function run() {
       res.send(result);
     });
 
-    app.get("/payments", verifyToken, verifyValidEmail, async (req, res) => {
-      const result = await paymentCollection
-        .find({ email: req.query?.email })
-        .toArray();
+    app.patch(
+      "/order-status/:id",
+      verifyToken,
+      verifyAdmin,
+      async (req, res) => {
+        const { status } = req.body;
+        res.send(
+          await paymentCollection.updateOne(
+            { _id: new ObjectId(req.params.id) },
+            { $set: { status } }
+          )
+        );
+      }
+    );
+
+    app.get("/payments", verifyToken, async (req, res) => {
+      const { email } = req?.query;
+      let query = {};
+      if (email) {
+        query.email = email;
+      }
+
+      const result = await paymentCollection.find(query).toArray();
       // result.forEach(async (history) => {
       for (const history of result) {
         const menuIds = history?.menuItemIds?.map((id) => new ObjectId(id));

@@ -65,7 +65,7 @@ const StatCard = ({ title, value, icon: Icon, gradient }) => (
     initial="hidden"
     animate="visible"
     transition={{ duration: 0.5 }}
-    className={`relative overflow-hidden rounded-2xl p-6 shadow-xl text-white ${gradient}`}
+    className={`relative overflow-hidden z-0 rounded-2xl p-6 shadow-xl text-white ${gradient}`}
   >
     <div className="absolute -top-6 -right-6 opacity-20">
       <Icon size={100} />
@@ -157,7 +157,7 @@ const AdminHome = () => {
       </motion.div>
 
       {/* STATS GRID */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+      <div className="grid grid-cols-1 z-0 sm:grid-cols-2 lg:grid-cols-4 gap-6">
         <StatCard
           title="Total Revenue"
           value={`$${stats?.revenue || 0}`}
