@@ -128,6 +128,9 @@ const ReusableForm = ({
             }
           }}
         />
+        {errors?.image && (
+          <span className="text-red-600 ">{errors?.image?.message}</span>
+        )}
         {previewImage && (
           <img
             src={previewImage}
@@ -137,12 +140,8 @@ const ReusableForm = ({
         )}
       </label>
 
-      {errors?.image && (
-        <span className="text-red-600 ">{errors?.image?.message}</span>
-      )}
-
       <button
-        disabled={errors?.image?.message || uploading}
+        disabled={uploading}
         type="submit"
         className={`btn ${
           errors?.image?.message

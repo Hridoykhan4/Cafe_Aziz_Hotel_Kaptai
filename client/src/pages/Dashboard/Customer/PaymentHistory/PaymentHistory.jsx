@@ -22,6 +22,7 @@ const PaymentHistory = () => {
       return data;
     },
     enabled: !!user && !loading,
+    refetchInterval: 4000,
   });
 
   if (isPending) return <LoadingSpinner></LoadingSpinner>;

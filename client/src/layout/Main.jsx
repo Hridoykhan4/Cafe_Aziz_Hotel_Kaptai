@@ -28,9 +28,9 @@ const Main = () => {
             behavior: "smooth",
           });
         }}
-        className="fixed bottom-10 right-4 w-12 h-12 flex justify-center items-center rounded-full bg-amber-600"
+        className="fixed z-[1000] bottom-10 right-4 w-12 h-12 flex justify-center btn items-center rounded-full bg-amber-600"
       >
-        <FaAirbnb className="text-white z-[1000] font-semibold animate-bounce"></FaAirbnb>
+        <FaAirbnb className="text-white  font-semibold animate-bounce"></FaAirbnb>
       </button>
 
       <footer>

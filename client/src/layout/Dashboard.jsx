@@ -89,6 +89,7 @@ const Dashboard = () => {
               <div className="w-9 rounded-full ring ring-green-400 ring-offset-2">
                 <img
                   className="object-cover"
+                  referrerPolicy="no-referrer"
                   src={user?.photoURL || "https://i.pravatar.cc/100"}
                 />
               </div>

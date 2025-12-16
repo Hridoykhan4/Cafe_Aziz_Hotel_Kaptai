@@ -67,6 +67,15 @@ const ManageBookings = () => {
     },
   });
 
+  const orderStatusStyle = (category) => {
+    const categoryStatus = {
+      confirmed: 'text-green-600',
+      pending: 'text-sky-600',
+      canceled: 'text-red-600',
+    }
+    return categoryStatus[category] || 'text-gray-600'
+  }
+
   if (isPending) return <LoadingSpinner></LoadingSpinner>;
   return (
     <section>
@@ -137,7 +146,7 @@ const ManageBookings = () => {
                   <br />
                   (Price: {booking?.price})
                 </td>
-                <td>{booking?.status}</td>
+                <td className={`${orderStatusStyle(booking.status)}`}>{booking?.status}</td>
                 <td className="flex gap-4">
                   <button
                     disabled={statusPending || booking?.status === "canceled"}

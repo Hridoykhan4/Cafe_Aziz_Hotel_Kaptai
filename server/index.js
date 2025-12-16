@@ -25,10 +25,11 @@ app.use(
     origin: [
       "http://localhost:5173",
       "https://bistro-boss-restaurant-kaptai.web.app",
+      "https://bistro-boss-restaurant-kaptai.firebaseapp.com",
     ],
   })
 );
-app.use(cors());
+// app.use(cors());
 app.use(express.json());
 
 /* -----Custom Middlewares Start */
@@ -208,7 +209,6 @@ async function run() {
     app.patch(
       "/menu/:id",
       verifyToken,
-      verifyValidEmail,
       verifyAdmin,
       asyncHandler(async (req, res) => {
         const { _id, ...rest } = req.body;
@@ -238,6 +238,10 @@ async function run() {
         res.send(await reviewCollection.find().toArray());
       })
     );
+
+    app.post('/reviews', verifyToken, async(req, res) => {
+      res.send(await reviewCollection.insertOne(req.body))
+    })
 
     /**
      * Cart Collection Start

@@ -157,16 +157,10 @@ const Navbar = () => {
             className="menu menu-sm dropdown-content bg-base-100 rounded-box z-1 mt-3 w-52 p-2 shadow"
           >
             <li>
-              <a className="justify-between">
-                {user?.displayName || "Guest"}
-                <span className="badge">Active</span>
-              </a>
+              <a className="justify-between">{user?.displayName || "Guest"}</a>
             </li>
             <li>
-              <a className="justify-between">
-                {user?.email || "Guest"}
-                <span className="badge"></span>
-              </a>
+              <a className="justify-between">{user?.email || "Guest"}</a>
             </li>
             <li>
               <button
@@ -221,23 +215,42 @@ const Navbar = () => {
 
       {/* Mobile Menu */}
       <div className="navbar-end lg:hidden">
-        <button
+      {/*   <button
           onClick={() => setOpen(!open)}
           className="btn btn-outline text-white"
         >
           ☰
-        </button>
+        </button> */}
 
-        {open && (
-          <motion.ul
-            initial={{ opacity: 0, scale: 0.95 }}
-            animate={{ opacity: 1, scale: 1 }}
-            transition={{ duration: 0.25 }}
-            className="absolute w-52 flex flex-col right-4 top-16 bg-gray-800 p-4 rounded-lg shadow-xl space-y-3"
+        {/* Mobile Menu */}
+        <div className="navbar-end lg:hidden">
+          <button
+            onClick={() => setOpen(true)}
+            className="btn btn-outline text-white"
           >
-            {navOptions}
-          </motion.ul>
-        )}
+            ☰
+          </button>
+
+          {open && (
+            <>
+              {/* Overlay (click outside) */}
+              <div
+                onClick={() => setOpen(false)}
+                className="fixed inset-0 bg-black/40 z-40"
+              ></div>
+
+              {/* Menu */}
+              <motion.ul
+                initial={{ opacity: 0, scale: 0.95 }}
+                animate={{ opacity: 1, scale: 1 }}
+                transition={{ duration: 0.25 }}
+                className="fixed z-50 w-52 right-4 top-16 bg-gray-800 p-4 rounded-lg shadow-xl space-y-3"
+              >
+                {navOptions}
+              </motion.ul>
+            </>
+          )}
+        </div>
       </div>
     </motion.div>
   );

@@ -59,11 +59,6 @@ const Order = () => {
     navigate(`/order/${categories[index]}`);
   };
 
-  /* Desktop autoplay only */
-  const autoplay =
-    typeof window !== "undefined" && window.innerWidth > 768
-      ? { delay: 3000, disableOnInteraction: false }
-      : false;
 
   return (
     <section className="bg-base-100">
@@ -136,8 +131,7 @@ const Order = () => {
                       modules={[Pagination, Autoplay, Navigation]}
                       navigation
                       pagination={{ clickable: true }}
-                      autoplay={autoplay}
-                      loop={items.length > 6}
+                      // autoplay={autoplay}
                       spaceBetween={30}
                       className="mt-12"
                     >

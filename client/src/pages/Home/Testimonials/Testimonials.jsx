@@ -11,9 +11,7 @@ const Testimonials = () => {
   const [reviews, setReviews] = useState([]);
   const axiosPublic = useAxiosPublic();
   useEffect(() => {
-    axiosPublic(`/reviews`)
-     
-      .then(({data}) => setReviews(data));
+    axiosPublic(`/reviews`).then(({ data }) => setReviews(data));
   }, [axiosPublic]);
 
   return (

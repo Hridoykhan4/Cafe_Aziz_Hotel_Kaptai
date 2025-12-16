@@ -100,7 +100,7 @@ const FoodCard = ({ item }) => {
       whileInView={{ opacity: 1 }}
       transition={{ ease: easeInOut }}
       viewport={{ once: true }}
-      className="card bg-base-100 shadow-xl rounded-2xl overflow-hidden transform transition duration-300 hover:scale-105 hover:shadow-2xl"
+      className="card bg-base-100 shadow-xl !z-0 rounded-2xl overflow-hidden transform transition duration-300 hover:scale-105 hover:shadow-2xl"
     >
       {/* Food Image */}
       <figure className="relative">

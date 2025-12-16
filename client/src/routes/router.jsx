@@ -19,6 +19,8 @@ import OrderItems from "../pages/Dashboard/Customer/PaymentHistory/OrderItems";
 import AdminHome from "../pages/Dashboard/Admin/AdminHome/AdminHome";
 import UserHome from "../pages/Dashboard/Customer/UserHome/UserHome";
 import ManageBookings from "../pages/Dashboard/Admin/ManageBookings/ManageBookings";
+import ErrorPage from "../pages/ErrorPage/ErrorPage";
+import AddReview from "../pages/Dashboard/Customer/AddReview/AddReview";
 
 const router = createBrowserRouter([
   {
@@ -73,6 +75,10 @@ const router = createBrowserRouter([
           },
         ],
       },
+      {
+        path: 'review',
+        element: <AddReview></AddReview>
+      },
       // Admin Routes
       {
         path: "adminHome",
@@ -122,6 +128,7 @@ const router = createBrowserRouter([
           </AdminRoute>
         ),
       },
+      
     ],
   },
   {
@@ -134,7 +141,7 @@ const router = createBrowserRouter([
   },
   {
     path: "*",
-    element: <h2>Error</h2>,
+    element: <ErrorPage />,
   },
 ]);
 
