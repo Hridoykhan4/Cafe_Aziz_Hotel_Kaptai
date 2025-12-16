@@ -347,7 +347,7 @@ async function run() {
       }
     );
 
-    app.get("/payments", verifyToken, verifyValidEmail, async (req, res) => {
+    app.get("/payments", verifyToken, async (req, res) => {
       const { email } = req?.query;
       let query = {};
       if (email) {
