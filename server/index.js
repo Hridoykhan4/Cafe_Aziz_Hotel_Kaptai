@@ -85,7 +85,7 @@ async function run() {
     const reviewCollection = client.db("bistroDB").collection("reviews");
     const cartCollection = client.db("bistroDB").collection("carts");
     const paymentCollection = client.db("bistroDB").collection("payments");
-
+    const bookingCollection = client.db("bistroDB").collection("bookings");
     /* ______________------JWT------____________ */
 
     app.post("/jwt", (req, res) => {
@@ -239,9 +239,9 @@ async function run() {
       })
     );
 
-    app.post('/reviews', verifyToken, async(req, res) => {
-      res.send(await reviewCollection.insertOne(req.body))
-    })
+    app.post("/reviews", verifyToken, async (req, res) => {
+      res.send(await reviewCollection.insertOne(req.body));
+    });
 
     /**
      * Cart Collection Start
@@ -282,6 +282,44 @@ async function run() {
      * Cart Collection End
      */
 
+    /* )))))))))BOOKING APIS START */
+
+    app.post("/bookings", verifyToken, async (req, res) => {
+      const booking = req.body;
+
+      const { date, time } = booking;
+
+      const today = new Date().toISOString().split("T")[0];
+      if (date < today) {
+        return res.status(400).send({ message: "Past dates are not allowed" });
+      }
+
+      const alreadyBooked = await bookingCollection.findOne({
+        date,
+        time,
+      });
+
+      if (alreadyBooked) {
+        return res
+          .status(409)
+          .send({ message: "This time slot is already booked" });
+      }
+
+      booking.email = req.decoded.email;
+      booking.status = "pending";
+      booking.createdAt = new Date();
+
+      const result = await bookingCollection.insertOne(booking);
+      res.send(result);
+    });
+
+    app.get("/bookings", verifyToken, verifyValidEmail, async (req, res) => {
+      const { email } = req.query;
+      res.send(await bookingCollection.find({ email }).toArray());
+    });
+
+    /* )))))))))BOOKING APIS End */
+
     /* ____---Payment Start---______ */
 
     app.post("/orderedItems", verifyToken, async (req, res) => {
@@ -309,7 +347,7 @@ async function run() {
       }
     );
 
-    app.get("/payments", verifyToken, async (req, res) => {
+    app.get("/payments", verifyToken, verifyValidEmail, async (req, res) => {
       const { email } = req?.query;
       let query = {};
       if (email) {
@@ -416,6 +454,46 @@ async function run() {
       ]);
       const revenue = revenueAgg[0]?.totalRevenue || 0;
       res.send({ users, menuItems, orders, revenue });
+    });
+
+    app.get("/user-stats", verifyToken, verifyValidEmail, async (req, res) => {
+      const { email } = req?.query;
+
+      const [menuItems, reviewCount, bookings, paymentStats] =
+        await Promise.all([
+          menuCollection.estimatedDocumentCount(),
+          reviewCollection.countDocuments({ email }),
+          bookingCollection.countDocuments({ email }),
+
+          paymentCollection
+            .aggregate([
+              { $match: { email } },
+              {
+                $group: {
+                  _id: null,
+                  totalPaid: { $sum: "$price" },
+                  totalPayments: { $sum: 1 },
+                  totalOrders: { $sum: { $size: "$menuItemIds" } },
+                },
+              },
+            ])
+            .toArray(),
+        ]);
+
+      const stats = paymentStats[0] || {
+        totalPaid: 0,
+        totalPayments: 0,
+        totalOrders: 0,
+      };
+
+      res.send({
+        menuItems: menuItems,
+        reviewCount,
+        totalPaid: stats.totalPaid,
+        totalPayments: stats.totalPayments,
+        totalOrders: stats.totalOrders,
+        bookings,
+      });
     });
 
     // used aggregate pipeline

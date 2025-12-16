@@ -21,6 +21,8 @@ import UserHome from "../pages/Dashboard/Customer/UserHome/UserHome";
 import ManageBookings from "../pages/Dashboard/Admin/ManageBookings/ManageBookings";
 import ErrorPage from "../pages/ErrorPage/ErrorPage";
 import AddReview from "../pages/Dashboard/Customer/AddReview/AddReview";
+import Reservation from "../pages/Dashboard/Customer/Reservation/Reservation";
+import Bookings from "../pages/Dashboard/Customer/Bookings/Bookings";
 
 const router = createBrowserRouter([
   {
@@ -78,6 +80,14 @@ const router = createBrowserRouter([
       {
         path: 'review',
         element: <AddReview></AddReview>
+      },
+      {
+        path: 'reservation',
+        element: <Reservation></Reservation>
+      },
+      {
+        path: 'bookings',
+        element: <Bookings></Bookings>
       },
       // Admin Routes
       {

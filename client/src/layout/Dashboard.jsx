@@ -20,11 +20,13 @@ import useCart from "../hooks/useCart";
 import useAdmin from "../hooks/useAdmin";
 import LoadingSpinner from "../components/LoadingSpinner";
 import useAuthValue from "../hooks/useAuthValue";
+import useMyBookings from "../hooks/useMyBookings";
 
 const Dashboard = () => {
   const { cart } = useCart();
   const { isAdmin, isAdminLoading } = useAdmin();
   const { user } = useAuthValue();
+  const { myBookings} = useMyBookings()
   const linkBase =
     "flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-300";
   const linkActive = "bg-green-100 text-green-700 font-semibold shadow-sm";
@@ -82,7 +84,7 @@ const Dashboard = () => {
             </label>
           </div>
           <div className="flex-1 text-xl font-bold text-gray-800">
-            {user?.displayName || 'Guest'} ({isAdmin ? "Admin" : "User"}) 
+            {user?.displayName || "Guest"} ({isAdmin ? "Admin" : "User"})
           </div>
           <div className="flex items-center gap-3">
             <div className="avatar">
@@ -101,7 +103,7 @@ const Dashboard = () => {
         <motion.div
           initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5, delay: 0.5, ease: 'easeInOut' }}
+          transition={{ duration: 0.5, delay: 0.5, ease: "easeInOut" }}
           className="p-4 lg:p-8"
         >
           <Outlet />
@@ -115,7 +117,9 @@ const Dashboard = () => {
         <aside className="w-72 bg-white min-h-full border-r shadow-xl">
           {/* BRAND */}
           <div className="px-6 py-6 border-b">
-            <h2 className="text-2xl font-extrabold text-green-600">Cafe Aziz</h2>
+            <h2 className="text-2xl font-extrabold text-green-600">
+              Cafe Aziz
+            </h2>
             <p className="text-xs text-gray-400">Hotel & Restaurant</p>
           </div>
 
@@ -187,6 +191,11 @@ const Dashboard = () => {
                   to="/dashboard/bookings"
                   icon={TbBrandBooking}
                   label="My Bookings"
+                  extra={
+                    <span className="badge badge-success badge-sm text-white">
+                      {myBookings?.length || 0}
+                    </span>
+                  }
                 />
               </>
             )}
