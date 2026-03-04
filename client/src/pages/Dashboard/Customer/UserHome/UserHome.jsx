@@ -86,7 +86,7 @@ const UserHome = () => {
               <FaStar></FaStar>
               REVIEWS:{" "}
               {userStats?.reviewCount || (
-                <Link to="/dashboard/addReview">Add Review Now</Link>
+                <Link to="/dashboard/review">Add Review Now</Link>
               )}
             </p>
             <p className="text-blue-600 flex gap-1 items-center">
