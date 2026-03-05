@@ -8,7 +8,6 @@ export default defineConfig({
     port: 5173,
     strictPort: false,
   },
-  // This helps Vite handle the complex Firebase/Stripe structures during development
   optimizeDeps: {
     include: [
       "firebase/app",
@@ -29,7 +28,6 @@ export default defineConfig({
     },
     rollupOptions: {
       output: {
-        // We use a function instead of an object to avoid the 'externalize' error
         manualChunks(id) {
           if (id.includes("node_modules")) {
             if (id.includes("firebase")) return "vendor-firebase";

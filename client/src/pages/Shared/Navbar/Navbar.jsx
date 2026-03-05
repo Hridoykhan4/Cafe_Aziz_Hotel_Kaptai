@@ -131,7 +131,7 @@ const Navbar = () => {
   const dashLinks = isAdmin ? adminLinks : customerLinks;
 
   useEffect(() => {
-    const fn = () => setScrolled(window.scrollY > 20); // Faster trigger for better UX
+    const fn = () => setScrolled(window.scrollY > 20); 
     window.addEventListener("scroll", fn, { passive: true });
     return () => window.removeEventListener("scroll", fn);
   }, []);
@@ -181,7 +181,6 @@ const Navbar = () => {
     }
   };
 
-  // Improved logic: Force solid background on dashboard and auth pages
   const isAuthPage = pathname === "/login" || pathname === "/signup";
   const solidNav = scrolled || pathname.startsWith("/dashboard") || isAuthPage;
 
@@ -189,9 +188,9 @@ const Navbar = () => {
     <>
       <nav
         className={[
-          "w-full fixed top-0 left-0 right-0 z-[100000] transition-all duration-500 ease-in-out",
+          "w-full fixed top-0 left-0 right-0 z-100000 transition-all duration-500 ease-in-out",
           solidNav
-            ? "bg-primary/96 backdrop-blur-xl py-3 shadow-[0_8px_30px_rgba(0,0,0,0.4)] border-b border-white/[0.05]"
+            ? "bg-primary/96 backdrop-blur-xl py-3 shadow-[0_8px_30px_rgba(0,0,0,0.4)] border-b border-white/5"
             : "bg-transparent py-5",
         ].join(" ")}
       >
@@ -253,7 +252,7 @@ const Navbar = () => {
                       className="w-9 h-9 rounded-full object-cover ring-2 ring-secondary/50 ring-offset-2 ring-offset-primary group-hover:ring-secondary transition-all"
                     />
                   </div>
-                  <span className="text-[11px] font-bold text-white/60 group-hover:text-white transition-colors max-w-[80px] truncate tracking-wide">
+                  <span className="text-[11px] font-bold text-white/60 group-hover:text-white transition-colors max-w-20 truncate tracking-wide">
                     {user.displayName?.split(" ")[0] || "User"}
                   </span>
                   <motion.svg
@@ -282,7 +281,7 @@ const Navbar = () => {
                       transition={{ duration: 0.14 }}
                       className="absolute right-0 mt-3 w-64 bg-white rounded-2xl shadow-[0_20px_60px_rgba(0,0,0,0.16)] border border-slate-100 overflow-hidden z-50"
                     >
-                      <div className="px-4 py-3.5 bg-gradient-to-br from-slate-50 to-white border-b border-slate-100">
+                      <div className="px-4 py-3.5 bg-linear-to-br from-slate-50 to-white border-b border-slate-100">
                         <p className="text-sm font-bold text-slate-800 truncate">
                           {user.displayName}
                         </p>
@@ -339,7 +338,7 @@ const Navbar = () => {
                 to="/login"
                 className="relative overflow-hidden px-7 py-2.5 rounded-full text-[11px] font-black tracking-widest uppercase text-white border border-secondary/50 hover:border-secondary hover:shadow-[0_0_20px_rgba(5,150,105,0.25)] active:scale-95 transition-all group"
               >
-                <span className="absolute inset-0 -translate-x-full group-hover:translate-x-full transition-transform duration-500 bg-gradient-to-r from-transparent via-white/10 to-transparent" />
+                <span className="absolute inset-0 -translate-x-full group-hover:translate-x-full transition-transform duration-500 bg-linear-to-r from-transparent via-white/10 to-transparent" />
                 Sign In
               </Link>
             )}
@@ -364,7 +363,7 @@ const Navbar = () => {
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
               onClick={closeDrawer}
-              className="fixed inset-0 bg-black/80 backdrop-blur-sm z-[100001]"
+              className="fixed inset-0 bg-black/80 backdrop-blur-sm z-100001"
             />
             <motion.aside
               key="panel"
@@ -372,7 +371,7 @@ const Navbar = () => {
               animate={{ x: 0 }}
               exit={{ x: "100%" }}
               transition={{ type: "spring", stiffness: 300, damping: 30 }}
-              className="fixed top-0 right-0 h-dvh w-[300px] bg-primary flex flex-col z-[100002] shadow-[-30px_0_80px_rgba(0,0,0,0.55)]"
+              className="fixed top-0 right-0 h-dvh w-75 bg-primary flex flex-col z-100002 shadow-[-30px_0_80px_rgba(0,0,0,0.55)]"
             >
               <div className="flex items-center justify-between px-6 pt-7 pb-5 border-b border-white/[0.07] shrink-0">
                 <div>
@@ -444,7 +443,7 @@ const Navbar = () => {
               <div className="px-5 pb-8 pt-4 border-t border-white/[0.07] shrink-0 space-y-3">
                 {user ? (
                   <>
-                    <div className="flex items-center gap-3 px-4 py-3 bg-white/[0.04] rounded-xl border border-white/[0.06]">
+                    <div className="flex items-center gap-3 px-4 py-3 bg-white/4 rounded-xl border border-white/6">
                       <div className="relative shrink-0">
                         <span className="absolute -bottom-0.5 -right-0.5 w-2.5 h-2.5 rounded-full bg-emerald-400 border-2 border-primary z-10" />
                         <img

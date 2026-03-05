@@ -1,91 +1,97 @@
-// Category.jsx
-import { Swiper, SwiperSlide } from "swiper/react";
-import "swiper/css";
-import "swiper/css/pagination";
-import { Pagination } from "swiper/modules";
+import { motion } from "framer-motion";
+import { useRef, useEffect, useState } from "react";
+import SectionTitle from "../../../components/SectionTitle/SectionTitle";
+
+// Assets
 import slide1 from "../../../assets/home/slide1.jpg";
 import slide2 from "../../../assets/home/slide2.jpg";
 import slide3 from "../../../assets/home/slide3.jpg";
 import slide4 from "../../../assets/home/slide4.jpg";
 import slide5 from "../../../assets/home/slide5.jpg";
-import SectionTitle from "../../../components/SectionTitle/SectionTitle";
-// eslint-disable-next-line no-unused-vars
-import { motion } from "framer-motion";
+
+const categories = [
+  { img: slide1, title: "Salads", count: "12 Items" },
+  { img: slide2, title: "Soups", count: "08 Items" },
+  { img: slide3, title: "Pizzas", count: "15 Items" },
+  { img: slide4, title: "Desserts", count: "10 Items" },
+  { img: slide5, title: "Beverages", count: "20 Items" },
+];
 
 const Category = () => {
-  const slides = [
-    { img: slide1, title: "SALADS" },
-    { img: slide2, title: "SOUPS" },
-    { img: slide3, title: "PIZZAS" },
-    { img: slide4, title: "DESSERTS" },
-    { img: slide5, title: "SALADS" },
-  ];
+  const [width, setWidth] = useState(0);
+  const carousel = useRef();
 
-  // Framer Motion Variants
-  const cardVariants = {
-    hidden: { opacity: 0, y: 40, scale: 0.95 },
-    visible: {
-      opacity: 1,
-      y: 0,
-      scale: 1,
-      transition: { duration: 0.6, ease: "easeOut" },
-    },
-    hover: { scale: 1.05, transition: { duration: 0.3 } },
-  };
+  useEffect(() => {
+    // Calculates how far we can scroll
+    setWidth(carousel.current.scrollWidth - carousel.current.offsetWidth);
+  }, []);
 
   return (
-    <section className="w-full max-w-7xl mx-auto px-4 mb-20 mt-12">
-      <SectionTitle
-        heading="Order Online"
-        subHeading="--- From 11:00am to 10:00pm ---"
-      />
-
-      <Swiper
-        slidesPerView={2}
-        spaceBetween={20}
-        breakpoints={{
-          640: { slidesPerView: 2, spaceBetween: 20 },
-          768: { slidesPerView: 3, spaceBetween: 25 },
-          1024: { slidesPerView: 3, spaceBetween: 30 },
-        }}
-        pagination={{ clickable: true }}
-        modules={[Pagination]}
-        className="mySwiper"
+    <section className="app-container section-padding overflow-hidden">
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        whileInView={{ opacity: 1, y: 0 }}
+        viewport={{ once: true }}
       >
-        {slides.map((slide, i) => (
-          <SwiperSlide key={i}>
+        <SectionTitle
+          heading="Order Online"
+          subHeading="--- From 11:00am to 10:00pm ---"
+        />
+      </motion.div>
+
+      {/* Main Carousel Wrapper */}
+      <motion.div
+        ref={carousel}
+        className="cursor-grab active:cursor-grabbing overflow-hidden"
+      >
+        <motion.div
+          drag="x"
+          dragConstraints={{ right: 0, left: -width }}
+          className="flex gap-6"
+        >
+          {categories.map((item, i) => (
             <motion.div
-              className="relative group rounded-2xl overflow-hidden shadow-xl"
-              variants={cardVariants}
-              initial="hidden"
-              whileInView="visible"
-              whileHover="hover"
-              viewport={{ once: true, amount: 0.3 }} 
+              key={i}
+              className="min-w-[280px] md:min-w-[320px] h-[450px] relative group rounded-3xl overflow-hidden shadow-2xl bg-primary"
             >
-              {/* Image */}
+              {/* Background Image */}
               <motion.img
-                src={slide.img}
-                alt={slide.title}
-                className="w-full h-64 object-cover"
-                whileHover={{ scale: 1.1 }}
-                transition={{ duration: 0.6, ease: "easeOut" }}
+                src={item.img}
+                alt={item.title}
+                className="w-full h-full object-cover pointer-events-none transition-transform duration-700 group-hover:scale-110"
               />
 
-              {/* Gradient Overlay */}
-              <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/60 to-black/80 opacity-70 group-hover:opacity-90 transition duration-500"></div>
+              {/* Sophisticated Gradient Overlay */}
+              <div className="absolute inset-0 bg-linear-to-t from-primary/90 via-primary/10 to-transparent opacity-80 group-hover:opacity-60 transition-opacity duration-500" />
 
-              {/* Title */}
-              <motion.h2
-                className="absolute bottom-6 left-1/2 -translate-x-1/2 text-2xl md:text-3xl font-extrabold text-white tracking-widest uppercase drop-shadow-lg"
-                whileHover={{ scale: 1.1 }}
-                transition={{ duration: 0.3 }}
-              >
-                {slide.title}
-              </motion.h2>
+              {/* Floating Content Card (Glassmorphism) */}
+              <div className="absolute inset-x-4 bottom-6 transition-all duration-500 transform translate-y-4 group-hover:translate-y-0">
+                <div className="glass-card p-6 rounded-2xl text-center backdrop-blur-lg bg-white/10 border border-white/20">
+                  <p className="text-secondary text-[10px] font-black uppercase tracking-[0.3em] mb-1">
+                    {item.count}
+                  </p>
+                  <h3 className="text-white text-2xl font-bold tracking-tight font-heading">
+                    {item.title}
+                  </h3>
+
+                  <div className="overflow-hidden h-0 group-hover:h-8 transition-all duration-500">
+                    <button className="mt-2 text-white/80 text-xs font-bold uppercase tracking-widest hover:text-secondary transition-colors">
+                      Browse Menu +
+                    </button>
+                  </div>
+                </div>
+              </div>
             </motion.div>
-          </SwiperSlide>
-        ))}
-      </Swiper>
+          ))}
+        </motion.div>
+      </motion.div>
+
+      {/* Scroll Indicator Hint */}
+      <div className="mt-8 flex justify-center gap-2">
+        <div className="w-12 h-1 bg-secondary rounded-full opacity-20" />
+        <div className="w-4 h-1 bg-secondary rounded-full" />
+        <div className="w-12 h-1 bg-secondary rounded-full opacity-20" />
+      </div>
     </section>
   );
 };

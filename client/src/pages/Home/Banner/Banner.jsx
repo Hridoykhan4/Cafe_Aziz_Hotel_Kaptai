@@ -11,10 +11,6 @@ import img3 from "../../../assets/home/banner3.jpg";
 import img4 from "../../../assets/home/banner4.jpg";
 import img5 from "../../../assets/home/banner5.jpg";
 
-/* ─────────────────────────────────────────────
-   cta.to is a function(isAdmin, user) => string
-   so every slide can make smart routing decisions
-───────────────────────────────────────────── */
 const slides = [
   {
     img: img1,
@@ -45,7 +41,6 @@ const slides = [
     sub: "A serene escape where great food meets genuine hospitality.",
     cta: {
       label: "Reserve a Table",
-      /* guest → login | admin → manage bookings | customer → reservation */
       to: (isAdmin, user) =>
         !user
           ? "/login"
@@ -81,7 +76,7 @@ const slides = [
 
 const INTERVAL = 6000;
 
-/* ── fallback when image fails to load ── */
+
 const Fallback = () => (
   <div className="absolute inset-0 bg-primary">
     <div
@@ -94,7 +89,7 @@ const Fallback = () => (
   </div>
 );
 
-/* ── per-slide image with graceful fallback ── */
+
 const SlideImage = ({ src, accent }) => {
   const [loaded, setLoaded] = useState(false);
   const [errored, setErrored] = useState(false);
@@ -164,7 +159,7 @@ const Banner = () => {
 
   return (
     <section
-      className="relative w-full h-[520px] md:h-screen min-h-[520px] max-h-[900px] overflow-hidden bg-primary select-none"
+      className="relative w-full h-130 md:h-screen min-h-130 max-h-900 overflow-hidden bg-primary select-none"
       onMouseEnter={() => setPaused(true)}
       onMouseLeave={() => setPaused(false)}
     >

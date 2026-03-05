@@ -1,83 +1,104 @@
 import { Outlet, useNavigation, useLocation } from "react-router-dom";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
+import { motion, AnimatePresence, useScroll, useSpring } from "framer-motion";
+import { FaChevronUp } from "react-icons/fa";
+
+// Shared Components
 import Footer from "../pages/Shared/Footer/Footer";
 import Navbar from "../pages/Shared/Navbar/Navbar";
 import LoadingSpinner from "../components/LoadingSpinner";
-import { FaChevronUp } from "react-icons/fa";
-import { motion, AnimatePresence, useScroll, useSpring } from "framer-motion";
 
 const Main = () => {
   const navigation = useNavigation();
   const { pathname } = useLocation();
   const [showScrollTop, setShowScrollTop] = useState(false);
 
+  // 1. Cinematic Scroll Progress Bar
   const { scrollYProgress } = useScroll();
   const scaleX = useSpring(scrollYProgress, {
-    stiffness: 120,
+    stiffness: 100,
     damping: 30,
     restDelta: 0.001,
   });
 
+  // 2. Optimized Scroll Behavior
   useEffect(() => {
+    // Immediate scroll to top on path change (prevents seeing bottom of new page)
     window.scrollTo({ top: 0, behavior: "instant" });
   }, [pathname]);
 
   useEffect(() => {
-    const onScroll = () => {
-      setShowScrollTop(window.scrollY > 400);
-    };
-    window.addEventListener("scroll", onScroll, { passive: true });
-    return () => window.removeEventListener("scroll", onScroll);
+    const handleScroll = () => setShowScrollTop(window.scrollY > 500);
+    window.addEventListener("scroll", handleScroll, { passive: true });
+    return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
-  const scrollToTop = () => {
-    window.scrollTo({ top: 0, behavior: "smooth" });
-  };
+  const scrollToTop = () => window.scrollTo({ top: 0, behavior: "smooth" });
+
+  // 3. Logic to identify if we are in a "Loading State" (for UX)
+  const isLoading = useMemo(
+    () => navigation.state === "loading",
+    [navigation.state],
+  );
 
   return (
-    /* FIX: Added bg-primary here. This prevents the white background 
-       from showing through the transparent navbar or during page transitions. */
-    <div className="relative w-full bg-primary min-h-screen flex flex-col">
-      {/* 1. PROGRESS BAR */}
+    <div className="relative min-h-screen flex flex-col bg-base-100 selection:bg-secondary/20 selection:text-secondary-content">
+      {/* ── TOP ORCHESTRATION ── */}
       <motion.div
-        className="fixed top-0 left-0 right-0 h-0.75 bg-secondary origin-left z-100001 pointer-events-none"
+        className="fixed top-0 left-0 right-0 h-1 bg-secondary origin-left z-99999 pointer-events-none"
         style={{ scaleX }}
       />
 
-      {/* 2. NAVBAR */}
       <Navbar />
 
-      {/* 3. MAIN CONTENT 
-          We use flex-1 to push the footer to the bottom on short pages.
-          We keep z-10 so it stays below the Navbar's z-index. */}
-      <main className="relative z-10 flex-1">
-        {navigation.state === "loading" ? (
-          <div className="h-[60vh] flex items-center justify-center">
-            <LoadingSpinner />
-          </div>
-        ) : (
-          <div key={pathname} className="fade-in">
-            <Outlet />
-          </div>
-        )}
+      {/* ── PAGE TRANSITION WRAPPER ── */}
+      <main className="flex-1 relative overflow-x-hidden">
+        <AnimatePresence mode="wait">
+          {isLoading ? (
+            <motion.div
+              key="loader"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              className="absolute inset-0 z-50 flex items-center justify-center bg-base-100/80 backdrop-blur-sm min-h-[60vh]"
+            >
+              <LoadingSpinner />
+            </motion.div>
+          ) : (
+            <motion.div
+              key={pathname}
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -10 }}
+              transition={{ duration: 0.4, ease: [0.22, 1, 0.36, 1] }}
+              className="w-full"
+            >
+              <Outlet />
+            </motion.div>
+          )}
+        </AnimatePresence>
       </main>
 
       <Footer />
 
-      {/* 4. SCROLL BUTTON */}
+      {/* ── INTERACTIVE ELEMENTS ── */}
       <AnimatePresence>
         {showScrollTop && (
           <motion.button
-            key="scroll-to-top"
-            initial={{ opacity: 0, scale: 0.5, y: 20 }}
+            initial={{ opacity: 0, scale: 0.8, y: 20 }}
             animate={{ opacity: 1, scale: 1, y: 0 }}
-            exit={{ opacity: 0, scale: 0.5, y: 20 }}
-            whileHover={{ scale: 1.1 }}
-            whileTap={{ scale: 0.9 }}
+            exit={{ opacity: 0, scale: 0.8, y: 20 }}
+            whileHover={{
+              y: -5,
+              backgroundColor: "var(--color-secondary)",
+              boxShadow: "0 20px 40px rgba(5,150,105,0.3)",
+            }}
+            whileTap={{ scale: 0.95 }}
             onClick={scrollToTop}
-            className="fixed bottom-8 right-8 z-6000 flex items-center justify-center w-12 h-12 rounded-full bg-secondary text-white shadow-[0_10px_30px_rgba(5,150,105,0.4)] transition-shadow hover:shadow-secondary/50"
+            aria-label="Scroll to top"
+            className="fixed bottom-8 right-8 z-90 w-14 h-14 rounded-2xl bg-primary text-white flex items-center justify-center shadow-2xl transition-colors border border-white/10"
           >
-            <FaChevronUp />
+            <FaChevronUp className="text-xl" />
           </motion.button>
         )}
       </AnimatePresence>
