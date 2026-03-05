@@ -13,15 +13,19 @@ const Home = () => {
   return (
     <section>
       <Helmet>
-        <title>Bistro | Home</title>
+        <title>Cafe Aziz | Home</title>
+        <meta
+          name="description"
+          content="The finest dining experience in Kaptai."
+        />
       </Helmet>
       <Banner></Banner>
-      <Category></Category>
+      {/* <Category></Category>
       <OurSlogan></OurSlogan>
       <PopularMenu></PopularMenu>
       <OurRecommends></OurRecommends>
       <Featured></Featured>
-      <Testimonials></Testimonials>
+      <Testimonials></Testimonials> */}
     </section>
   );
 };

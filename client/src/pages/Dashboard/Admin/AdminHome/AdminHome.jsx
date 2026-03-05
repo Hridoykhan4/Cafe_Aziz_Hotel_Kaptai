@@ -136,7 +136,7 @@ const AdminHome = () => {
   return (
     <div className="space-y-8">
       <Helmet>
-        <title>Bistro | Admin Dashboard</title>
+        <title>Cafe Aziz | Admin Dashboard</title>
       </Helmet>
 
       {/* HEADER */}

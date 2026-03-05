@@ -8,7 +8,7 @@ const Contact = () => {
   return (
     <section>
       <Helmet>
-              <title>Bistro | Contact</title>
+              <title>Cafe Aziz | Contact</title>
             </Helmet>
       <Cover img={coverBg} title="Contact Us" desc="Reach us anytime!"></Cover>
       <div className="mb-12">

@@ -65,7 +65,7 @@ const SignUp = () => {
       await updateUserProfile(data.name, cloud?.url);
 
       // Store user in database
-      const userInfo = { name: data.name, email: data.email };
+      const userInfo = { name: data.name, email: data.email, role: 'user' };
       const res = await axiosPublic.post("/users", userInfo);
       if (res?.data?.insertedId) {
         Swal.fire({

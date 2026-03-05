@@ -33,7 +33,7 @@ const UserHome = () => {
   return (
     <div>
       <Helmet>
-        <title>Bistro | User Dashboard</title>
+        <title>Cafe Aziz | User Dashboard</title>
       </Helmet>
       <motion.div
         initial={{ opacity: 0, y: -20 }}

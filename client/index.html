@@ -2,12 +2,117 @@
 <html lang="en" data-theme="light">
   <head>
     <meta charset="UTF-8" />
-    <link rel="icon" type="image/svg+xml" href="/logo.png" />
+    <link rel="icon" type="image/png" href="/logo.png" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Cafe Aziz Hotel Restaurant</title>
+
+    <title>Cafe Aziz | Best Hotel & Restaurant in Kaptai</title>
+    <meta name="title" content="Cafe Aziz | Hotel & Restaurant Kaptai" />
+    <meta
+      name="description"
+      content="Experience the finest dining and comfortable stay at Cafe Aziz, Kaptai. Authentic local cuisine and premium hospitality."
+    />
+    <meta
+      name="keywords"
+      content="Cafe Aziz, Kaptai Restaurant, Kaptai Hotel, Rangamati Dining, Best food in Kaptai"
+    />
+
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content="https://yourdomain.com/" />
+    <meta property="og:title" content="Cafe Aziz | Hotel & Restaurant Kaptai" />
+    <meta
+      property="og:description"
+      content="Fine dining and premium stays in the heart of Kaptai."
+    />
+    <meta property="og:image" content="/og-image.jpg" />
+    <meta property="twitter:card" content="summary_large_image" />
+    <meta
+      property="twitter:title"
+      content="Cafe Aziz | Hotel & Restaurant Kaptai"
+    />
+    <meta
+      property="twitter:description"
+      content="Fine dining and premium stays in the heart of Kaptai."
+    />
+
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&family=Playfair+Display:ital,wght@0,700;1,700&display=swap"
+      rel="stylesheet"
+    />
+
+    <style>
+      body {
+        margin: 0;
+        background-color: #ffffff;
+        font-family: "Inter", sans-serif;
+        overflow-x: hidden;
+      }
+      #initial-loader {
+        position: fixed;
+        inset: 0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: white;
+        z-index: 9999;
+        transition: opacity 0.4s ease-out;
+      }
+      .loader-img {
+        width: 100px;
+        height: auto;
+      }
+
+      #root:empty {
+        display: none;
+      }
+
+      .fade-in {
+        animation: fadeIn 0.6s ease-out forwards;
+      }
+      @keyframes fadeIn {
+        from {
+          opacity: 0;
+        }
+        to {
+          opacity: 1;
+        }
+      }
+    </style>
   </head>
   <body>
+    <div id="initial-loader">
+      <img
+        src="/src/assets/others/loader3.gif"
+        alt="Loading Cafe Aziz..."
+        class="loader-img"
+      />
+    </div>
+
+    <noscript>
+      <div style="text-align: center; padding: 50px">
+        <h1>JavaScript Required</h1>
+        <p>Please enable JavaScript to view the Cafe Aziz website.</p>
+      </div>
+    </noscript>
+
     <div id="root"></div>
+
     <script type="module" src="/src/main.jsx"></script>
+
+    <script>
+      const hideLoader = () => {
+        const loader = document.getElementById("initial-loader");
+        if (loader) {
+          loader.style.opacity = "0";
+          setTimeout(() => loader.remove(), 400);
+          document.getElementById("root").classList.add("fade-in");
+        }
+      };
+
+      window.addEventListener("load", hideLoader);
+
+      setTimeout(hideLoader, 3000);
+    </script>
   </body>
 </html>

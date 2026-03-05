@@ -1,100 +1,118 @@
 import { createBrowserRouter } from "react-router-dom";
-import Main from "../layout/Main";
-import Home from "../pages/Home/Home/Home";
-import Menu from "../pages/Menu/Menu/Menu";
-import Order from "../pages/Order/Order/Order";
-import Contact from "../pages/Contact/Contact/Contact";
-import Login from "../pages/Login/Login";
-import SignUp from "../pages/SignUp/SignUp";
-import PrivateRoute from "./PrivateRoute";
-import Dashboard from "../layout/Dashboard";
-import Cart from "../pages/Dashboard/Customer/Cart/Cart";
-import AllUsers from "../pages/Dashboard/Admin/AllUsers/AllUsers";
-import AdminRoute from "./AdminRoute";
-import ManageItems from "../pages/Dashboard/Admin/ManageItems/ManageItems";
-import ItemFormPage from "../components/ItemFormPage/ItemFormPage";
-import Payment from "../pages/Dashboard/Customer/Payment/Payment";
-import PaymentHistory from "../pages/Dashboard/Customer/PaymentHistory/PaymentHistory";
-import OrderItems from "../pages/Dashboard/Customer/PaymentHistory/OrderItems";
-import AdminHome from "../pages/Dashboard/Admin/AdminHome/AdminHome";
-import UserHome from "../pages/Dashboard/Customer/UserHome/UserHome";
-import ManageBookings from "../pages/Dashboard/Admin/ManageBookings/ManageBookings";
-import ErrorPage from "../pages/ErrorPage/ErrorPage";
-import AddReview from "../pages/Dashboard/Customer/AddReview/AddReview";
-import Reservation from "../pages/Dashboard/Customer/Reservation/Reservation";
-import Bookings from "../pages/Dashboard/Customer/Bookings/Bookings";
+import { lazy, Suspense } from "react";
 
+// Layouts
+import Main from "../layout/Main";
+import PrivateRoute from "./PrivateRoute";
+import AdminRoute from "./AdminRoute";
+import ErrorPage from "../pages/ErrorPage/ErrorPage";
+import LoadingSpinner from "../components/LoadingSpinner";
+
+
+// --- Higher Order Component for Lazy Loading ---
+// eslint-disable-next-line react-refresh/only-export-components, no-unused-vars
+const Loadable = (Component) => (props) => (
+  <Suspense fallback={<LoadingSpinner />}>
+    <Component {...props} />
+  </Suspense>
+);
+
+// --- Lazy Loaded Pages ---
+const Home = Loadable(lazy(() => import("../pages/Home/Home/Home")));
+const Menu = Loadable(lazy(() => import("../pages/Menu/Menu/Menu")));
+const Order = Loadable(lazy(() => import("../pages/Order/Order/Order")));
+const Contact = Loadable(
+  lazy(() => import("../pages/Contact/Contact/Contact")),
+);
+const Login = Loadable(lazy(() => import("../pages/Login/Login")));
+const SignUp = Loadable(lazy(() => import("../pages/SignUp/SignUp")));
+
+// Dashboard Layout & Pages
+const DashboardLayout = Loadable(lazy(() => import("../layout/Dashboard")));
+const UserHome = Loadable(
+  lazy(() => import("../pages/Dashboard/Customer/UserHome/UserHome")),
+);
+const Cart = Loadable(
+  lazy(() => import("../pages/Dashboard/Customer/Cart/Cart")),
+);
+const Payment = Loadable(
+  lazy(() => import("../pages/Dashboard/Customer/Payment/Payment")),
+);
+const PaymentHistory = Loadable(
+  lazy(
+    () => import("../pages/Dashboard/Customer/PaymentHistory/PaymentHistory"),
+  ),
+);
+const OrderItems = Loadable(
+  lazy(() => import("../pages/Dashboard/Customer/PaymentHistory/OrderItems")),
+);
+const AddReview = Loadable(
+  lazy(() => import("../pages/Dashboard/Customer/AddReview/AddReview")),
+);
+const Reservation = Loadable(
+  lazy(() => import("../pages/Dashboard/Customer/Reservation/Reservation")),
+);
+const Bookings = Loadable(
+  lazy(() => import("../pages/Dashboard/Customer/Bookings/Bookings")),
+);
+
+// Admin Pages
+const AdminHome = Loadable(
+  lazy(() => import("../pages/Dashboard/Admin/AdminHome/AdminHome")),
+);
+const AllUsers = Loadable(
+  lazy(() => import("../pages/Dashboard/Admin/AllUsers/AllUsers")),
+);
+const ManageItems = Loadable(
+  lazy(() => import("../pages/Dashboard/Admin/ManageItems/ManageItems")),
+);
+const ItemFormPage = Loadable(
+  lazy(() => import("../components/ItemFormPage/ItemFormPage")),
+);
+const ManageBookings = Loadable(
+  lazy(() => import("../pages/Dashboard/Admin/ManageBookings/ManageBookings")),
+);
+
+// --- Router Configuration ---
 const router = createBrowserRouter([
   {
     path: "/",
-    element: <Main></Main>,
+    element: <Main />,
+    errorElement: <ErrorPage />,
     children: [
-      {
-        path: "/",
-        element: <Home></Home>,
-      },
-      {
-        path: "/menu",
-        element: <Menu></Menu>,
-      },
-      {
-        path: "/order/:category",
-        element: <Order></Order>,
-      },
-      {
-        path: "/contact",
-        element: <Contact></Contact>,
-      },
+      { index: true, element: <Home /> },
+      { path: "menu", element: <Menu /> },
+      { path: "order/:category", element: <Order /> },
+      { path: "contact", element: <Contact /> },
     ],
   },
   {
-    path: "/dashboard",
+    path: "dashboard",
     element: (
       <PrivateRoute>
-        <Dashboard></Dashboard>
+        <DashboardLayout />
       </PrivateRoute>
     ),
     children: [
-      {
-        path: "userHome",
-        element: <UserHome></UserHome>,
-      },
-      {
-        path: "cart",
-        element: <Cart></Cart>,
-      },
-      {
-        path: "payment",
-        element: <Payment></Payment>,
-      },
+      // Customer Routes
+      { path: "userHome", element: <UserHome /> },
+      { path: "cart", element: <Cart /> },
+      { path: "payment", element: <Payment /> },
       {
         path: "payment_history",
-        element: <PaymentHistory></PaymentHistory>,
-        children: [
-          {
-            path: "menuIds",
-            element: <OrderItems></OrderItems>,
-          },
-        ],
+        element: <PaymentHistory />,
+        children: [{ path: "menuIds", element: <OrderItems /> }],
       },
-      {
-        path: 'review',
-        element: <AddReview></AddReview>
-      },
-      {
-        path: 'reservation',
-        element: <Reservation></Reservation>
-      },
-      {
-        path: 'bookings',
-        element: <Bookings></Bookings>
-      },
-      // Admin Routes
+      { path: "review", element: <AddReview /> },
+      { path: "reservation", element: <Reservation /> },
+      { path: "bookings", element: <Bookings /> },
+
+      // Admin Routes (Wrapped individually for security & performance)
       {
         path: "adminHome",
         element: (
           <AdminRoute>
-            <AdminHome></AdminHome>
+            <AdminHome />
           </AdminRoute>
         ),
       },
@@ -102,7 +120,7 @@ const router = createBrowserRouter([
         path: "allUsers",
         element: (
           <AdminRoute>
-            <AllUsers></AllUsers>
+            <AllUsers />
           </AdminRoute>
         ),
       },
@@ -110,7 +128,7 @@ const router = createBrowserRouter([
         path: "addItems",
         element: (
           <AdminRoute>
-            <ItemFormPage mode="add"></ItemFormPage>
+            <ItemFormPage mode="add" />
           </AdminRoute>
         ),
       },
@@ -118,7 +136,7 @@ const router = createBrowserRouter([
         path: "manageItems",
         element: (
           <AdminRoute>
-            <ManageItems></ManageItems>
+            <ManageItems />
           </AdminRoute>
         ),
       },
@@ -126,7 +144,7 @@ const router = createBrowserRouter([
         path: "updateItems/:id",
         element: (
           <AdminRoute>
-            <ItemFormPage mode="update"></ItemFormPage>
+            <ItemFormPage mode="update" />
           </AdminRoute>
         ),
       },
@@ -134,25 +152,15 @@ const router = createBrowserRouter([
         path: "manageBooking",
         element: (
           <AdminRoute>
-            <ManageBookings></ManageBookings>
+            <ManageBookings />
           </AdminRoute>
         ),
       },
-      
     ],
   },
-  {
-    path: "/login",
-    element: <Login></Login>,
-  },
-  {
-    path: "/signup",
-    element: <SignUp></SignUp>,
-  },
-  {
-    path: "*",
-    element: <ErrorPage />,
-  },
+  { path: "login", element: <Login /> },
+  { path: "signup", element: <SignUp /> },
+  { path: "*", element: <ErrorPage /> },
 ]);
 
 export default router;

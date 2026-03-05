@@ -1,53 +1,56 @@
-import "react-responsive-carousel/lib/styles/carousel.min.css";
-import { Carousel } from "react-responsive-carousel";
+import { useState, useEffect } from "react";
+import { motion, AnimatePresence } from "framer-motion";
 import img1 from "../../../assets/home/banner.jpg";
 import img2 from "../../../assets/home/pexels-change-c-c-974768353-30700761.jpg";
 import img3 from "../../../assets/home/pexels-harry-dona-2338407.jpg";
 import img4 from "../../../assets/home/featured.jpg";
 import img5 from "../../../assets/home/pexels-sylwester-ficek-154797634-20321627.jpg";
 
+const images = [img1, img2, img3, img4, img5];
+
 const Banner = () => {
-  const images = [img1, img2, img3, img4, img5];
+  const [index, setIndex] = useState(0);
+
+  useEffect(() => {
+    const timer = setInterval(() => {
+      setIndex((prev) => (prev + 1) % images.length);
+    }, 5000);
+    return () => clearInterval(timer);
+  }, []);
 
   return (
-    <section className="w-full overflow-hidden rounded-2xl shadow-2xl">
-      <Carousel
-        autoPlay
-        infiniteLoop
-        interval={5000}
-        transitionTime={900}
-        swipeable
-        emulateTouch
-        stopOnHover={false}
-        showThumbs={false}
-        showStatus={false}
-        showArrows
-      >
-        {images.map((src, index) => (
-          <div key={index} className="relative h-[420px] md:h-screen">
-            <img
-              src={src}
-              alt={`Slide ${index + 1}`}
-              className="h-full w-full object-cover"
-            />
+    <section className="relative w-full h-[450px] md:h-screen overflow-hidden bg-primary">
+      <AnimatePresence mode="wait">
+        <motion.img
+          key={index}
+          src={images[index]}
+          initial={{ opacity: 0, scale: 1.1 }}
+          animate={{ opacity: 1, scale: 1 }}
+          exit={{ opacity: 0 }}
+          transition={{ duration: 1.2, ease: "easeOut" }}
+          className="absolute inset-0 w-full h-full object-cover"
+        />
+      </AnimatePresence>
 
-            <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/50 to-black/60"></div>
+      {/* Overlay */}
+      <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-black/40" />
 
-            <div className="absolute inset-0 flex items-center justify-center text-center px-6">
-              <div className="max-w-3xl">
-                <h1 className="text-white text-2xl md:text-5xl font-semibold tracking-wide leading-tight">
-                  শান্ত পরিবেশে
-                  <br />
-                  <span className="text-emerald-300">বিশ্বাসযোগ্য সেবা</span>
-                </h1>
-                <p className="mt-4 text-gray-200 text-sm md:text-lg">
-                  আপনার আরাম, আমাদের দায়িত্ব
-                </p>
-              </div>
-            </div>
-          </div>
-        ))}
-      </Carousel>
+      {/* Content */}
+      <div className="absolute inset-0 flex items-center justify-center text-center z-10">
+        <motion.div
+          initial={{ y: 20, opacity: 0 }}
+          animate={{ y: 0, opacity: 1 }}
+          className="max-w-3xl px-6"
+        >
+          <h1 className="text-white text-3xl md:text-6xl font-bold leading-tight uppercase tracking-tighter">
+            শান্ত পরিবেশে <br />
+            <span className="text-secondary">বিশ্বাসযোগ্য সেবা</span>
+          </h1>
+          <p className="mt-4 text-gray-200 text-lg">
+            আপনার আরাম, আমাদের দায়িত্ব
+          </p>
+        </motion.div>
+      </div>
     </section>
   );
 };

@@ -5,7 +5,6 @@ import Cover from "../../Shared/Cover/Cover";
 import SectionTitle from "../../../components/SectionTitle/SectionTitle";
 import MenuCategory from "../MenuCategory/MenuCategory";
 import useMenu from "../../../hooks/useMenu";
-import useScrollTo from "../../../hooks/useScrollTo";
 
 import menuImg from "../../../assets/menu/banner3.jpg";
 import dessertBg from "../../../assets/menu/dessert-bg.jpeg";
@@ -19,7 +18,7 @@ const fadeUp = {
 };
 
 const Menu = () => {
-  useScrollTo();
+  
   const { menu } = useMenu();
 
   const categories = [

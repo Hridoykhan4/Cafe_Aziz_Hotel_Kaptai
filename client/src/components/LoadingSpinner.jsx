@@ -1,12 +1,10 @@
-import spin from "../assets/others/loader3.gif";
-
 const LoadingSpinner = () => {
   return (
-    <div className="flex items-center justify-center h-screen bg-white">
-      <img 
-        src={spin} 
-        alt="Loading..." 
-        className="w-28 h-28 "
+    <div className="flex h-[70vh] items-center justify-center bg-white">
+      <img
+        src="/src/assets/others/loader3.gif"
+        alt="Cafe Aziz Loading..."
+        className="w-24 h-24 object-contain"
       />
     </div>
   );
