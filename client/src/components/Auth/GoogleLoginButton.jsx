@@ -1,60 +1,107 @@
+import { useState } from "react"; // Added for loading state
 import { FcGoogle } from "react-icons/fc";
 import useAuthValue from "../../hooks/useAuthValue";
 import { useNavigate } from "react-router-dom";
 import Swal from "sweetalert2";
 import useAxiosPublic from "../../hooks/useAxiosPublic";
+import LoadingSpinner from "../LoadingSpinner";
 
-const GoogleLoginButton = ({ from }) => {
-  const { googleSignIn, setUser, user } = useAuthValue();
+const GoogleLoginButton = ({ from = "/" }) => {
+  const { googleSignIn, setUser } = useAuthValue();
+  const [isAuthenticating, setIsAuthenticating] = useState(false); // Double-click guard
   const navigate = useNavigate();
   const axiosPublic = useAxiosPublic();
+
   const handleGoogleLogin = async () => {
+    // 1. Prevent multiple clicks
+    if (isAuthenticating) return;
+
     try {
+      setIsAuthenticating(true);
+
+      // 2. Trigger Google Auth
       const result = await googleSignIn();
+      const googleUser = result?.user;
+
+      // 3. Update Auth Context
       setUser({
-        ...result,
-        displayName: result?.user?.displayName,
-        photoURL: result?.user?.photoURL,
+        ...googleUser,
+        displayName: googleUser?.displayName,
+        photoURL: googleUser?.photoURL,
       });
+
       const userInfo = {
-        name: result?.user?.displayName,
-        email: result?.user?.email,
-        role: 'user'
+        name: googleUser?.displayName,
+        email: googleUser?.email,
+        role: "user",
       };
-      const { data } = await axiosPublic.post("/users", userInfo);
-      // console.log(data);
-      if (data?.insertedId) {
+
+      // 4. Sync with Database
+      await axiosPublic.post("/users", userInfo);
+
+      // 5. Success Feedback
+      Swal.fire({
+        title: "Welcome Back 🎉",
+        text: `Successfully authenticated as ${googleUser?.displayName || "Member"}`,
+        icon: "success",
+        background: "#ffffff",
+        color: "#0f172a",
+        showConfirmButton: false,
+        timer: 2000,
+      });
+
+      navigate(from, { replace: true });
+    } catch (err) {
+      // Handle "Popup closed" or "Cancelled" errors gracefully
+      console.error("Google Auth Error:", err);
+
+      // Only show error alert if it's not a user-cancellation
+      if (err.code !== "auth/popup-closed-by-user") {
         Swal.fire({
-          title: "Welcome 🎉",
-          text: `Logged in as ${user?.displayName || result.user?.email}`,
-          icon: "success",
-          background: "#ecfdf5",
-          color: "#065f46",
-          confirmButtonColor: "#10b981",
-          timer: 2000,
-          showConfirmButton: false,
+          title: "Sign-In Interrupted",
+          text: err.message || "Could not connect to Google.",
+          icon: "error",
+          confirmButtonColor: "#0f172a",
         });
       }
-      navigate(from);
-    } catch (err) {
-      Swal.fire({
-        title: "Google Sign-In Failed",
-        text: err.message || "Something went wrong.",
-        icon: "error",
-        background: "#fef2f2",
-        color: "#7f1d1d",
-        confirmButtonColor: "#ef4444",
-      });
+    } finally {
+      // 6. Unlock the button regardless of outcome
+      setIsAuthenticating(false);
     }
   };
 
   return (
     <button
       onClick={handleGoogleLogin}
-      className="w-full cursor-pointer flex items-center justify-center gap-3 px-4 py-2 border rounded-lg shadow-sm hover:shadow-md transition bg-white text-gray-700 font-medium"
+      type="button"
+      disabled={isAuthenticating} // Disable interaction while loading
+      className={`group w-full flex items-center justify-center gap-3 h-14 border-2 border-base-200 rounded-2xl bg-white transition-all duration-300 shadow-sm
+        ${
+          isAuthenticating
+            ? "opacity-70 cursor-not-allowed bg-base-100"
+            : "hover:bg-base-50 hover:border-primary/10 active:scale-[0.98] hover:shadow-md cursor-pointer"
+        }`}
     >
-      <FcGoogle className="text-xl" />
-      Continue with Google
+      {isAuthenticating && (
+        <div className="fixed inset-0 z-100 bg-white/20 backdrop-blur-[2px] cursor-wait flex items-center justify-center">
+          <LoadingSpinner></LoadingSpinner>
+        </div>
+      )}
+      {isAuthenticating ? (
+        <>
+          <span className="loading loading-spinner loading-sm text-primary"></span>
+          <span className="text-sm font-black tracking-widest text-primary/40 uppercase">
+            Connecting...
+          </span>
+        </>
+      ) : (
+        <>
+          <FcGoogle className="text-2xl group-hover:scale-110 transition-transform duration-300" />
+          <span className="text-sm font-black tracking-widest text-primary/70 uppercase">
+            Continue with Google
+          </span>
+        </>
+      )}
     </button>
   );
 };

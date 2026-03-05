@@ -13,7 +13,7 @@ const Main = () => {
   const { pathname } = useLocation();
   const [showScrollTop, setShowScrollTop] = useState(false);
 
-  // 1. Cinematic Scroll Progress Bar
+  // 1. Scroll Progress Bar
   const { scrollYProgress } = useScroll();
   const scaleX = useSpring(scrollYProgress, {
     stiffness: 100,
@@ -23,7 +23,6 @@ const Main = () => {
 
   // 2. Optimized Scroll Behavior
   useEffect(() => {
-    // Immediate scroll to top on path change (prevents seeing bottom of new page)
     window.scrollTo({ top: 0, behavior: "instant" });
   }, [pathname]);
 
@@ -35,7 +34,7 @@ const Main = () => {
 
   const scrollToTop = () => window.scrollTo({ top: 0, behavior: "smooth" });
 
-  // 3. Logic to identify if we are in a "Loading State" (for UX)
+  // 3. "Loading State" (for UX)
   const isLoading = useMemo(
     () => navigation.state === "loading",
     [navigation.state],
@@ -43,10 +42,12 @@ const Main = () => {
 
   return (
     <div className="relative min-h-screen flex flex-col bg-base-100 selection:bg-secondary/20 selection:text-secondary-content">
-      {/* ── TOP ORCHESTRATION ── */}
       <motion.div
-        className="fixed top-0 left-0 right-0 h-1 bg-secondary origin-left z-99999 pointer-events-none"
-        style={{ scaleX }}
+        className="fixed top-0 left-0 right-0 h-1.5 bg-secondary origin-left pointer-events-none"
+        style={{
+          scaleX,
+          zIndex: 2147483647, 
+        }}
       />
 
       <Navbar />

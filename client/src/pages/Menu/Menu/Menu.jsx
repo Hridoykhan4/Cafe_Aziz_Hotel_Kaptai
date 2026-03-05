@@ -1,5 +1,3 @@
-
-// eslint-disable-next-line no-unused-vars
 import { motion } from "framer-motion";
 import Cover from "../../Shared/Cover/Cover";
 import SectionTitle from "../../../components/SectionTitle/SectionTitle";
@@ -12,13 +10,7 @@ import soupBg from "../../../assets/menu/soup-bg.jpg";
 import saladBg from "../../../assets/menu/salad-bg.jpg";
 import pizzaBg from "../../../assets/menu/pizza-bg.jpg";
 
-const fadeUp = {
-  hidden: { opacity: 0, y: 30 },
-  visible: { opacity: 1, y: 0 },
-};
-
 const Menu = () => {
-  
   const { menu } = useMenu();
 
   const categories = [
@@ -57,56 +49,50 @@ const Menu = () => {
     }, {}) || {};
 
   return (
-    <section className="bg-base-100">
-    
-      {/* HERO */}
+    <section className="bg-base-100 pb-20">
+      {/* ── HERO SECTION ── */}
       <Cover
         img={menuImg}
         title="Our Menu"
         desc="Discover flavors crafted with passion"
       />
 
-      {/* TODAY'S OFFER */}
-      <motion.div
-        variants={fadeUp}
-        initial="hidden"
-        whileInView="visible"
-        viewport={{ once: true }}
-        transition={{ duration: 0.6 }}
-        className="container mx-auto px-4"
-      >
+      {/* ── TODAY'S OFFER ── */}
+      <div className="section-padding app-container">
         <SectionTitle
-          subHeading="---Don't miss---"
-          heading="🔥 Today's Offer"
+          subHeading="Don't miss"
+          heading="Today's Offer"
+          dark={false}
         />
 
         {categorizedMenu["offered"]?.length ? (
           <MenuCategory items={categorizedMenu["offered"]} />
         ) : (
-          <p className="text-center text-gray-400 py-10">
-            No offers available today
+          <p className="text-center text-base-content/40 py-10 font-light italic">
+            No gourmet offers available today...
           </p>
         )}
-      </motion.div>
+      </div>
 
-      {/* CATEGORY SECTIONS */}
-      {categories.map(({ key, title, desc, coverImage }) => (
-        <motion.div
-          key={key}
-          variants={fadeUp}
-          initial="hidden"
-          whileInView="visible"
-          viewport={{ once: true }}
-          transition={{ duration: 0.6 }}
-        >
-          <MenuCategory
-            title={title}
-            desc={desc}
-            coverImage={coverImage}
-            items={categorizedMenu[key] || []}
-          />
-        </motion.div>
-      ))}
+      {/* ── CATEGORY SECTIONS ── */}
+      <div className="space-y-24">
+        {categories.map(({ key, title, desc, coverImage }) => (
+          <motion.div
+            key={key}
+            initial={{ opacity: 0, y: 40 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true, margin: "-100px" }}
+            transition={{ duration: 0.8 }}
+          >
+            <MenuCategory
+              title={title}
+              desc={desc}
+              coverImage={coverImage}
+              items={categorizedMenu[key] || []}
+            />
+          </motion.div>
+        ))}
+      </div>
     </section>
   );
 };

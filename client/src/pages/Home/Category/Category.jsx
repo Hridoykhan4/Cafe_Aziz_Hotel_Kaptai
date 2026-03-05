@@ -1,4 +1,4 @@
-import { motion } from "framer-motion";
+import { motion, useScroll, useTransform } from "framer-motion";
 import { useRef, useEffect, useState } from "react";
 import SectionTitle from "../../../components/SectionTitle/SectionTitle";
 
@@ -22,75 +22,101 @@ const Category = () => {
   const carousel = useRef();
 
   useEffect(() => {
-    // Calculates how far we can scroll
     setWidth(carousel.current.scrollWidth - carousel.current.offsetWidth);
   }, []);
 
   return (
-    <section className="app-container section-padding overflow-hidden">
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        whileInView={{ opacity: 1, y: 0 }}
-        viewport={{ once: true }}
-      >
-        <SectionTitle
-          heading="Order Online"
-          subHeading="--- From 11:00am to 10:00pm ---"
-        />
-      </motion.div>
+    <section className="section-padding overflow-hidden bg-base-100">
+      {/* Title with staggered reveal */}
+      <SectionTitle
+        heading="Order Online"
+        subHeading="From 11:00am to 10:00pm"
+      />
 
-      {/* Main Carousel Wrapper */}
       <motion.div
         ref={carousel}
-        className="cursor-grab active:cursor-grabbing overflow-hidden"
+        className="cursor-grab active:cursor-grabbing"
+        initial={{ opacity: 0, x: 100 }}
+        whileInView={{ opacity: 1, x: 0 }}
+        viewport={{ once: true, amount: 0.2 }}
+        transition={{ duration: 0.8, ease: "easeOut" }}
       >
         <motion.div
           drag="x"
           dragConstraints={{ right: 0, left: -width }}
-          className="flex gap-6"
+          whileTap={{ cursor: "grabbing" }}
+          className="flex gap-8 px-4"
         >
           {categories.map((item, i) => (
             <motion.div
               key={i}
-              className="min-w-[280px] md:min-w-[320px] h-[450px] relative group rounded-3xl overflow-hidden shadow-2xl bg-primary"
+              initial={{ opacity: 0, y: 30 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ delay: i * 0.1, duration: 0.6 }}
+              whileHover={{ y: -10 }}
+              className="min-w-75 md:min-w-87.5 h-125 relative group rounded-[2.5rem] overflow-hidden shadow-2xl"
             >
-              {/* Background Image */}
+              {/* Image with Parallax Scale */}
               <motion.img
                 src={item.img}
                 alt={item.title}
-                className="w-full h-full object-cover pointer-events-none transition-transform duration-700 group-hover:scale-110"
+                className="w-full h-full object-cover pointer-events-none transition-transform duration-1000 group-hover:scale-110"
               />
 
               {/* Sophisticated Gradient Overlay */}
-              <div className="absolute inset-0 bg-linear-to-t from-primary/90 via-primary/10 to-transparent opacity-80 group-hover:opacity-60 transition-opacity duration-500" />
+              <div className="absolute inset-0 bg-linear-to-t from-primary/95 via-primary/20 to-transparent opacity-90 group-hover:opacity-75 transition-opacity duration-500" />
 
-              {/* Floating Content Card (Glassmorphism) */}
-              <div className="absolute inset-x-4 bottom-6 transition-all duration-500 transform translate-y-4 group-hover:translate-y-0">
-                <div className="glass-card p-6 rounded-2xl text-center backdrop-blur-lg bg-white/10 border border-white/20">
-                  <p className="text-secondary text-[10px] font-black uppercase tracking-[0.3em] mb-1">
+              {/* The "Shine" Animation */}
+              <div className="absolute inset-0 opacity-0 group-hover:opacity-20 transition-opacity duration-700 pointer-events-none bg-linear-to-r from-transparent via-white to-transparent -translate-x-full group-hover:translate-x-full transform skew-x-12" />
+
+              {/* Content Box */}
+              <div className="absolute inset-x-6 bottom-8">
+                <div className="glass-card p-8 rounded-3xl text-center backdrop-blur-xl bg-white/5 border border-white/10 shadow-2xl translate-y-4 group-hover:translate-y-0 transition-transform duration-500">
+                  <p className="text-secondary text-[11px] font-black uppercase tracking-[0.4em] mb-2 opacity-80">
                     {item.count}
                   </p>
-                  <h3 className="text-white text-2xl font-bold tracking-tight font-heading">
+                  <h3 className="text-white text-3xl font-bold tracking-tight font-heading mb-4">
                     {item.title}
                   </h3>
 
-                  <div className="overflow-hidden h-0 group-hover:h-8 transition-all duration-500">
-                    <button className="mt-2 text-white/80 text-xs font-bold uppercase tracking-widest hover:text-secondary transition-colors">
-                      Browse Menu +
-                    </button>
-                  </div>
+                  {/* Action Link */}
+                  <motion.div className="flex justify-center items-center gap-2 text-white/60 group-hover:text-secondary transition-colors duration-300">
+                    <span className="text-[10px] font-bold uppercase tracking-widest">
+                      Explore Category
+                    </span>
+                    <div className="w-8 h-1px bg-current transition-all duration-300 group-hover:w-12" />
+                  </motion.div>
                 </div>
+              </div>
+
+              {/* Category Number Badge */}
+              <div className="absolute top-6 right-6 w-12 h-12 rounded-full border border-white/20 backdrop-blur-md flex items-center justify-center text-white/40 font-black text-xs group-hover:border-secondary group-hover:text-secondary transition-colors duration-500">
+                0{i + 1}
               </div>
             </motion.div>
           ))}
         </motion.div>
       </motion.div>
 
-      {/* Scroll Indicator Hint */}
-      <div className="mt-8 flex justify-center gap-2">
-        <div className="w-12 h-1 bg-secondary rounded-full opacity-20" />
-        <div className="w-4 h-1 bg-secondary rounded-full" />
-        <div className="w-12 h-1 bg-secondary rounded-full opacity-20" />
+      {/* Modern Interaction Hint */}
+      <div className="mt-12 flex flex-col items-center gap-4">
+        <div className="flex items-center gap-3">
+          {categories.map((_, i) => (
+            <motion.div
+              key={i}
+              className="h-1 bg-secondary rounded-full"
+              initial={false}
+              animate={{
+                width: i === 0 ? 32 : 8,
+                opacity: i === 0 ? 1 : 0.2,
+              }}
+            />
+          ))}
+        </div>
+        <p className="text-primary/30 text-[10px] font-bold uppercase tracking-[0.2em] animate-pulse">
+          Drag to explore
+        </p>
       </div>
     </section>
   );

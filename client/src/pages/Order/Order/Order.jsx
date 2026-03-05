@@ -1,155 +1,158 @@
-
-import { Tab, Tabs, TabList, TabPanel } from "react-tabs";
-import { useEffect, useMemo, useState } from "react";
+import { useMemo, useRef, useCallback, useEffect } from "react";
 import { useNavigate, useParams } from "react-router-dom";
-// eslint-disable-next-line no-unused-vars
-import { motion } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
 
 import Cover from "../../Shared/Cover/Cover";
 import useMenu from "../../../hooks/useMenu";
 import FoodCard from "../../../components/FoodCard/FoodCard";
-
 import orderCover from "../../../assets/shop/order.jpg";
-
-/* Swiper */
-import { Swiper, SwiperSlide } from "swiper/react";
-import { Pagination, Autoplay, Navigation } from "swiper/modules";
-import "swiper/css";
-import "swiper/css/pagination";
-import "swiper/css/navigation";
 
 const categories = ["salad", "pizza", "soup", "dessert", "drinks"];
 
-const chunkArray = (arr, size) =>
-  Array.from({ length: Math.ceil(arr.length / size) }, (_, i) =>
-    arr.slice(i * size, i * size + size)
-  );
-
-const fadeUp = {
-  hidden: { opacity: 0, y: 30 },
-  visible: { opacity: 1, y: 0 },
+const categoryMeta = {
+  salad: { emoji: "🥗", label: "Salad" },
+  pizza: { emoji: "🍕", label: "Pizza" },
+  soup: { emoji: "🍜", label: "Soup" },
+  dessert: { emoji: "🍰", label: "Dessert" },
+  drinks: { emoji: "🥤", label: "Drinks" },
 };
 
 const Order = () => {
   const navigate = useNavigate();
-  const { category } = useParams();
+  const { category = "salad" } = useParams();
   const { menu } = useMenu();
+  const tabsRef = useRef(null);
 
-  /* Active tab from URL */
-  const initialTab = categories.indexOf(category);
-  const [tabIndex, setTabIndex] = useState(initialTab >= 0 ? initialTab : 0);
+  const activeCategory = categories.includes(category.toLowerCase())
+    ? category.toLowerCase()
+    : "salad";
 
+  const categorizedMenu = useMemo(
+    () => menu.filter((item) => item.category === activeCategory),
+    [menu, activeCategory],
+  );
+
+  // PREVENT GLOBAL SCROLL JUMP
+  // This effectively overrides any ScrollToTop components for this route
   useEffect(() => {
-    const idx = categories.indexOf(category);
-    if (idx !== -1) setTabIndex(idx);
-  }, [category]);
+    if ("scrollRestoration" in window.history) {
+      window.history.scrollRestoration = "manual";
+    }
+    return () => {
+      if ("scrollRestoration" in window.history) {
+        window.history.scrollRestoration = "auto";
+      }
+    };
+  }, []);
 
-  /* Group menu by category */
-  const categorizedMenu = useMemo(() => {
-    const grouped = Object.fromEntries(categories.map((c) => [c, []]));
-    menu.forEach((item) => {
-      if (grouped[item.category]) grouped[item.category].push(item);
-    });
-    return grouped;
-  }, [menu]);
+  const handleTabClick = useCallback(
+    (cat) => {
+      if (cat === activeCategory) return;
 
-  /* Sync tab + URL */
-  const handleTabSelect = (index) => {
-    setTabIndex(index);
-    navigate(`/order/${categories[index]}`);
-  };
+      // Professional Scroll Anchor:
+      // Calculate exactly where the user is and stay there.
+      if (tabsRef.current) {
+        const navbarHeight = 85;
+        const elementPosition =
+          tabsRef.current.getBoundingClientRect().top + window.pageYOffset;
+        const offsetPosition = elementPosition - navbarHeight;
 
+        window.scrollTo({
+          top: offsetPosition,
+          behavior: "smooth", // Smooth feel for a premium site
+        });
+      }
+
+      // Small delay to let the smooth scroll begin before the URL change
+      setTimeout(() => {
+        navigate(`/order/${cat}`, { replace: true });
+      }, 50);
+    },
+    [activeCategory, navigate],
+  );
 
   return (
-    <section className="bg-base-100">
-      
-    
-
-      {/* HERO */}
+    <section className="bg-base-100 min-h-screen pb-24 selection:bg-secondary/20">
       <Cover
         img={orderCover}
-        title="Order Your Favorite Food"
-        desc="Freshly prepared, fast delivered, unforgettable taste"
+        title="Order Online"
+        desc="Gourmet flavors delivered to your doorstep"
       />
 
-      {/* INTRO */}
-      <motion.div
-        variants={fadeUp}
-        initial="hidden"
-        animate="visible"
-        transition={{ duration: 0.6 }}
-        className="max-w-3xl mx-auto text-center px-6 mt-14"
-      >
-        <h2 className="text-4xl font-extrabold tracking-tight mb-4">
-          🍽 Pick a Category & Order
-        </h2>
-        <p className="text-gray-600 text-lg leading-relaxed">
-          From healthy salads to cheesy pizzas — everything is crafted with
-          quality ingredients and love.
-        </p>
-      </motion.div>
-
-      {/* TABS */}
-      <div className="max-w-7xl mx-auto px-6 my-14">
-        <Tabs selectedIndex={tabIndex} onSelect={handleTabSelect}>
-          <TabList className="flex flex-wrap justify-center gap-4 border-b pb-5">
-            {categories.map((c) => (
-              <Tab
-                key={c}
-                className="px-6 py-2 rounded-full cursor-pointer capitalize font-semibold
-                           text-gray-600 border border-gray-200
-                           hover:bg-green-50 hover:text-green-600
-                           transition-all duration-300"
-                selectedClassName="bg-green-600 text-white border-green-600 shadow-md"
-              >
-                {c}
-              </Tab>
-            ))}
-          </TabList>
-
-          {/* PANELS */}
-          {categories.map((c) => {
-            const items = categorizedMenu[c];
-            const slides = chunkArray(items, 6);
-
-            return (
-              <TabPanel key={c}>
-                <motion.div
-                  variants={fadeUp}
-                  initial="hidden"
-                  whileInView="visible"
-                  viewport={{ once: true }}
-                  transition={{ duration: 0.5 }}
+      <div className="app-container mt-12" ref={tabsRef}>
+        {/* ── NEXT-LEVEL TAB NAVIGATION ── */}
+        <div className="flex justify-center mb-16">
+          <nav className="inline-flex items-center p-1.5 bg-base-200/50 backdrop-blur-xl rounded-full border border-base-300 overflow-hidden">
+            {categories.map((cat) => {
+              const isActive = activeCategory === cat;
+              return (
+                <button
+                  key={cat}
+                  onClick={() => handleTabClick(cat)}
+                  className="relative px-6 py-3 md:px-10 md:py-4 rounded-full cursor-pointer outline-none select-none no-tap-highlight group"
                 >
-                  {items.length === 0 ? (
-                    <p className="text-center text-gray-400 italic mt-10">
-                      No items available in this category
-                    </p>
-                  ) : (
-                    <Swiper
-                      modules={[Pagination, Autoplay, Navigation]}
-                      navigation
-                      pagination={{ clickable: true }}
-                      // autoplay={autoplay}
-                      spaceBetween={30}
-                      className="mt-12"
-                    >
-                      {slides.map((group, idx) => (
-                        <SwiperSlide key={idx}>
-                          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
-                            {group.map((item) => (
-                              <FoodCard key={item._id} item={item} />
-                            ))}
-                          </div>
-                        </SwiperSlide>
-                      ))}
-                    </Swiper>
+                  {isActive && (
+                    <motion.span
+                      layoutId="activePill"
+                      className="absolute inset-0 bg-secondary rounded-full shadow-lg shadow-secondary/30"
+                      transition={{
+                        type: "spring",
+                        bounce: 0.15,
+                        duration: 0.6,
+                      }}
+                    />
                   )}
-                </motion.div>
-              </TabPanel>
-            );
-          })}
-        </Tabs>
+                  <span
+                    className={`relative z-10 flex items-center gap-2 font-heading font-black text-[10px] md:text-[11px] uppercase tracking-[0.2em] transition-colors duration-300 ${
+                      isActive
+                        ? "text-white"
+                        : "text-primary/40 group-hover:text-primary/70"
+                    }`}
+                  >
+                    <span className="hidden md:inline">
+                      {categoryMeta[cat].emoji}
+                    </span>
+                    {categoryMeta[cat].label}
+                  </span>
+                </button>
+              );
+            })}
+          </nav>
+        </div>
+
+        {/* ── CONTENT GRID WITH POP-LAYOUT ── */}
+        <div className="relative min-h-150">
+          <AnimatePresence mode="popLayout" initial={false}>
+            <motion.div
+              key={activeCategory}
+              initial={{ opacity: 0, x: 20 }}
+              animate={{ opacity: 1, x: 0 }}
+              exit={{ opacity: 0, x: -20 }}
+              transition={{ duration: 0.4, ease: "circOut" }}
+            >
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8 md:gap-10">
+                {categorizedMenu.length > 0 ? (
+                  categorizedMenu.map((item, idx) => (
+                    <motion.div
+                      key={item._id}
+                      initial={{ opacity: 0, scale: 0.9 }}
+                      animate={{ opacity: 1, scale: 1 }}
+                      transition={{ delay: idx * 0.03 }}
+                    >
+                      <FoodCard item={item} />
+                    </motion.div>
+                  ))
+                ) : (
+                  <div className="col-span-full py-32 text-center opacity-30">
+                    <p className="font-heading italic tracking-[0.3em] uppercase text-sm">
+                      Refining Selection...
+                    </p>
+                  </div>
+                )}
+              </div>
+            </motion.div>
+          </AnimatePresence>
+        </div>
       </div>
     </section>
   );

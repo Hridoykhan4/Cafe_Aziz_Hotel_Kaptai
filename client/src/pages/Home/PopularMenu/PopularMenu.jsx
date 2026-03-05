@@ -2,6 +2,7 @@ import SectionTitle from "../../../components/SectionTitle/SectionTitle";
 import MenuItem from "../../Shared/MenuItem/MenuItem";
 import useMenu from "../../../hooks/useMenu";
 import { Link } from "react-router-dom";
+import { motion } from "framer-motion";
 
 const PopularMenu = () => {
   const { menu, loading } = useMenu();
@@ -9,30 +10,47 @@ const PopularMenu = () => {
 
   if (loading)
     return (
-      <>
-        <span className="loading loading-dots loading-lg"></span>
-        <span className="loading loading-dots loading-xl"></span>
-      </>
+      <div className="flex justify-center py-20">
+        <span className="loading loading-spinner loading-lg text-secondary"></span>
+      </div>
     );
+
   return (
-    <section className="w-full max-w-7xl mx-auto px-4 mb-20 mt-6">
+    <section className="section-padding bg-base-100 relative">
       <SectionTitle
         heading="From Our Menu"
-        subHeading="--- Popular Items ---"
+        subHeading="Our Chef's Popular Picks"
       />
-      <div className="grid sm:grid-cols-2 gap-4">
-        {popular?.map((item) => (
-          <MenuItem item={item} key={item._id}></MenuItem>
+
+      {/* Grid with specialized gap for readability */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-x-12 gap-y-10">
+        {popular?.map((item, index) => (
+          <MenuItem item={item} key={item._id} index={index} />
         ))}
       </div>
-      <div className="text-center">
+
+      {/* ── PREMIUM VIEW FULL MENU BUTTON ── */}
+      <motion.div
+        className="text-center mt-16"
+        initial={{ opacity: 0, y: 20 }}
+        whileInView={{ opacity: 1, y: 0 }}
+        viewport={{ once: true }}
+      >
         <Link
           to="/menu"
-          className="btn mt-6 bg-gray-800 hover:bg-gray-900 text-white px-6 py-2 rounded-full font-semibold tracking-wide shadow-md hover:shadow-lg transition-transform hover:scale-105"
+          className="group relative inline-flex items-center justify-center px-10 py-4 font-bold text-white transition-all duration-300 bg-primary rounded-full hover:bg-secondary shadow-xl shadow-primary/20 hover:shadow-secondary/30"
         >
-          View Full Menu ➡️
+          <span className="relative z-10 flex items-center gap-2 tracking-widest text-xs uppercase">
+            View Full Menu
+            <motion.span
+              animate={{ x: [0, 5, 0] }}
+              transition={{ repeat: Infinity, duration: 1.5 }}
+            >
+              →
+            </motion.span>
+          </span>
         </Link>
-      </div>
+      </motion.div>
     </section>
   );
 };

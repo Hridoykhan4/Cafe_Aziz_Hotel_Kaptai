@@ -1,70 +1,115 @@
-// import SectionTitle from "../../../components/SectionTitle/SectionTitle";
-// import { Swiper, SwiperSlide } from "swiper/react";
-// import quotation from "../../../assets/icon/icons8-quotation.gif";
-// import "swiper/css";
-// import "swiper/css/navigation";
-// import { Navigation } from "swiper/modules";
-// import { useEffect, useState } from "react";
-// import useAxiosPublic from "../../../hooks/useAxiosPublic";
+import { useEffect, useState } from "react";
+import { motion, AnimatePresence } from "framer-motion";
+import SectionTitle from "../../../components/SectionTitle/SectionTitle";
+import useAxiosPublic from "../../../hooks/useAxiosPublic";
 
-// const Testimonials = () => {
-//   const [reviews, setReviews] = useState([]);
-//   const axiosPublic = useAxiosPublic();
-//   useEffect(() => {
-//     axiosPublic(`/reviews`).then(({ data }) => setReviews(data));
-//   }, [axiosPublic]);
+const Testimonials = () => {
+  const [reviews, setReviews] = useState([]);
+  const [index, setIndex] = useState(0);
+  const [direction, setDirection] = useState(0);
+  const axiosPublic = useAxiosPublic();
 
-//   return (
-//     <section className="w-full max-w-7xl mx-auto mb-16 mt-16 px-4 py-10 rounded-3xl bg-gradient-to-br from-gray-900 via-gray-800 to-black shadow-2xl overflow-hidden">
-//       <SectionTitle
-//         heading="Testimonials"
-//         subHeading="What Our Clients Say"
-//       ></SectionTitle>
+  useEffect(() => {
+    axiosPublic(`/reviews`).then(({ data }) => setReviews(data));
+  }, [axiosPublic]);
 
-//       <Swiper
-//         navigation={true}
-//         modules={[Navigation]}
-//         className="mySwiper py-8"
-//       >
-//         {reviews?.map((review) => (
-//           <SwiperSlide key={review?._id}>
-//             <div className="flex flex-col items-center text-center px-6 py-10 bg-white/5   rounded-2xl shadow-lg backdrop-blur-lg hover:scale-[1.02] transition-transform duration-300">
-//               {/* Star Ratings */}
-//               <div className="flex justify-center items-center gap-1 mb-4">
-//                 {[1, 2, 3, 4, 5].map((star, idx) => (
-//                   <span
-//                     key={idx}
-//                     className={`text-2xl ${
-//                       review?.rating >= star
-//                         ? "text-yellow-400"
-//                         : "text-gray-500"
-//                     }`}
-//                   >
-//                     ★
-//                   </span>
-//                 ))}
-//               </div>
+  const nextStep = () => {
+    setDirection(1);
+    setIndex((prev) => (prev + 1) % reviews.length);
+  };
 
-//               {/* Quotation Icon */}
-//               <div className="flex justify-center mb-6">
-//                 <img src={quotation} alt="quotation" className="w-10 h-10" />
-//               </div>
+  const prevStep = () => {
+    setDirection(-1);
+    setIndex((prev) => (prev - 1 + reviews.length) % reviews.length);
+  };
 
-//               {/* Review Text */}
-//               <p className="text-gray-200 max-w-2xl italic leading-relaxed mb-6">
-//                 “{review?.details}”
-//               </p>
+  if (!reviews.length) return null;
 
-//               {/* Reviewer Name */}
-//               <h3 className="text-lg font-semibold text-orange-400 tracking-wide">
-//                 — {review?.name}
-//               </h3>
-//             </div>
-//           </SwiperSlide>
-//         ))}
-//       </Swiper>
-//     </section>
-//   );
-// };
+  const { name, details, rating } = reviews[index];
 
-// export default Testimonials;
+  return (
+    <section className="section-padding bg-base-100 overflow-hidden">
+      <div className="app-container">
+        <SectionTitle
+          heading="Testimonials"
+          subHeading="Voices of Our Guests"
+        />
+        {/* Reduced margin-top (mt-6 instead of mt-10) to pull content closer to Title */}
+        <div className="relative max-w-4xl mx-auto ">
+          {/* Main Review Card - REMOVED min-h-112.5 */}
+          <div className="relative flex items-center justify-center">
+            <AnimatePresence mode="wait" custom={direction}>
+              <motion.div
+                key={index}
+                custom={direction}
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -20 }}
+                transition={{ duration: 0.4, ease: "easeOut" }}
+                // Using your glass-card and rounded-selector
+                className="glass-card p-8 md:p-12 rounded-selector text-center w-full shadow-xl shadow-primary/5 border-base-200"
+              >
+                {/* 1. Emerald Star Rating - More compact mb-4 */}
+                <div className="flex justify-center gap-1 mb-4">
+                  {[...Array(5)].map((_, i) => (
+                    <svg
+                      key={i}
+                      className={`w-5 h-5 ${i < rating ? "text-secondary" : "text-base-300"}`}
+                      fill="currentColor"
+                      viewBox="0 0 20 20"
+                    >
+                      <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
+                    </svg>
+                  ))}
+                </div>
+
+                {/* 2. Quotation - Absolute positioned to save vertical space */}
+                <span className="text-secondary opacity-10 text-9xl font-serif absolute top-4 left-6 select-none">
+                  “
+                </span>
+
+                {/* 3. Review Text - Reduced font size for better balance */}
+                <p className="relative z-10 text-primary/80 text-lg md:text-2xl font-main font-light italic leading-relaxed mb-8 px-2 md:px-10">
+                  {details}
+                </p>
+
+                {/* 4. Reviewer Meta - Compact Layout */}
+                <div className="flex flex-col items-center">
+                  <div className="h-0.5 w-8 bg-secondary/30 rounded-full mb-3" />
+                  <h4 className="text-primary font-heading text-xl font-bold uppercase tracking-widest">
+                    {name}
+                  </h4>
+                  <p className="text-secondary font-black text-[9px] uppercase tracking-[0.3em] mt-2 opacity-80">
+                    Verified Guest
+                  </p>
+                </div>
+              </motion.div>
+            </AnimatePresence>
+          </div>
+
+          {/* 5. Luxury Controls - Pulled up with negative margin to sit closer to card */}
+          <div className="flex justify-center gap-4 mt-8">
+            <button
+              onClick={prevStep}
+              className="w-12 h-12 rounded-full border border-primary/10 flex items-center justify-center hover:bg-primary hover:text-white transition-all duration-300 group active:scale-95"
+            >
+              <span className="group-hover:-translate-x-1 transition-transform">
+                ←
+              </span>
+            </button>
+            <button
+              onClick={nextStep}
+              className="w-12 h-12 rounded-full bg-secondary text-white flex items-center justify-center shadow-lg shadow-secondary/30 hover:scale-105 transition-all duration-300 group active:scale-95"
+            >
+              <span className="group-hover:translate-x-1 transition-transform">
+                →
+              </span>
+            </button>
+          </div>
+        </div>
+      </div>
+    </section>
+  );
+};
+
+export default Testimonials;

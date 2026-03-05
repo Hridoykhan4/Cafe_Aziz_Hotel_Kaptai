@@ -69,9 +69,10 @@
     @apply max-w-7xl mx-auto px-4 sm:px-6 lg:px-8;
   }
 
+  
   /* Spacing Utilities for Sections */
   .section-padding {
-    @apply py-12 md:py-20 lg:py-28;
+    @apply py-8 md:py-16 ;
   }
 
   /* Premium Card Styles */
@@ -110,5 +111,22 @@
 @layer utilities {
   .text-shadow-premium {
     text-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+  }
+  .menu-connector {
+    flex: 1;
+    border-bottom: 2px dotted #e2e8f0; /* Use base-300 or slate-200 */
+    margin: 0 12px;
+    height: 14px;
+    opacity: 0.5;
+  }
+  .no-scrollbar::-webkit-scrollbar {
+    display: none;
+  }
+  .no-scrollbar {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+  .no-tap-highlight {
+    -webkit-tap-highlight-color: transparent;
   }
 }
