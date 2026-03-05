@@ -1,4 +1,3 @@
-import { Helmet } from "react-helmet-async";
 import loginImg from "../../assets/others/authentication1.png";
 import { useState } from "react";
 import ReCAPTCHA from "react-google-recaptcha";
@@ -69,9 +68,6 @@ const Login = () => {
       animate={{ y: 0, opacity: 1 }}
       transition={{ delay: 0.3, ease: easeInOut, duration: 1 }}
     >
-      <Helmet>
-        <title>Cafe Aziz - Login</title>
-      </Helmet>
 
       <div className="hero min-h-screen bg-gradient-to-br from-gray-50 via-white to-gray-100">
         <div className="hero-content flex-col lg:flex-row-reverse gap-10">

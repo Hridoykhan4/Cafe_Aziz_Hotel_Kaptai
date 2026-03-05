@@ -2,14 +2,10 @@ import Cover from "../../Shared/Cover/Cover";
 import coverBg from "../../../assets/contact/banner.jpg";
 import SectionTitle from "../../../components/SectionTitle/SectionTitle";
 import useScrollTo from "../../../hooks/useScrollTo";
-import { Helmet } from "react-helmet-async";
 const Contact = () => {
     useScrollTo()
   return (
     <section>
-      <Helmet>
-              <title>Cafe Aziz | Contact</title>
-            </Helmet>
       <Cover img={coverBg} title="Contact Us" desc="Reach us anytime!"></Cover>
       <div className="mb-12">
         <div>

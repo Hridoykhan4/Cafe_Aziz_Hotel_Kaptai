@@ -1,4 +1,3 @@
-import { Helmet } from "react-helmet-async";
 import loginImg from "../../assets/others/authentication.gif";
 import useAuthValue from "../../hooks/useAuthValue";
 import { Link, useNavigate } from "react-router-dom";
@@ -100,9 +99,7 @@ const SignUp = () => {
       animate={{ x: 0, opacity: 1 }}
       transition={{ delay: 0.3, ease: easeInOut, duration: 1 }}
     >
-      <Helmet>
-        <title>Cafe Aziz - Register</title>
-      </Helmet>
+      
 
       <div className="hero min-h-screen bg-gradient-to-br from-gray-50 via-white to-gray-100">
         <div className="hero-content flex-col lg:flex-row-reverse gap-10">

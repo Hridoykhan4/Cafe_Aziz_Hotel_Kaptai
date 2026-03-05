@@ -4,7 +4,6 @@ import useCart from "../../../../hooks/useCart";
 import { FaTrashAlt } from "react-icons/fa";
 import Swal from "sweetalert2";
 import useAxiosSecure from "../../../../hooks/useAxiosSecure";
-import { Helmet } from "react-helmet-async";
 import { Link } from "react-router-dom";
 
 const Cart = () => {
@@ -39,9 +38,7 @@ const Cart = () => {
 
   return (
     <section>
-      <Helmet>
-        <title>Cafe Aziz | Dashboard</title>
-      </Helmet>
+    
       <div className="text-center space-y-2">
         <SectionTitle
           heading={"Wanna add more?"}

@@ -35,27 +35,27 @@ const Main = () => {
   };
 
   return (
-    /* h-full is safer than min-h-screen for sticky stability */
-    <div className="relative w-full">
-      {/* 1. PROGRESS BAR - Must be top-level */}
+    /* FIX: Added bg-primary here. This prevents the white background 
+       from showing through the transparent navbar or during page transitions. */
+    <div className="relative w-full bg-primary min-h-screen flex flex-col">
+      {/* 1. PROGRESS BAR */}
       <motion.div
-        className="fixed top-0 left-0 right-0 h-[3px] bg-secondary origin-left z-[9999] pointer-events-none"
+        className="fixed top-0 left-0 right-0 h-0.75 bg-secondary origin-left z-100001 pointer-events-none"
         style={{ scaleX }}
       />
 
-      {/* 2. NAVBAR - Positioned absolutely at the top level of the body */}
+      {/* 2. NAVBAR */}
       <Navbar />
 
-      {/* 3. MAIN CONTENT - Added pt-0 to ensure it goes UNDER the transparent nav */}
-      <main className="relative z-10">
+      {/* 3. MAIN CONTENT 
+          We use flex-1 to push the footer to the bottom on short pages.
+          We keep z-10 so it stays below the Navbar's z-index. */}
+      <main className="relative z-10 flex-1">
         {navigation.state === "loading" ? (
-          <div className="h-screen flex items-center justify-center">
+          <div className="h-[60vh] flex items-center justify-center">
             <LoadingSpinner />
           </div>
         ) : (
-          /* FIX: Removed the motion.div wrapper around Outlet. 
-             The 'fade-in' class from your CSS is safer than Framer Motion 
-             for the main layout container to prevent breaking 'fixed' children. */
           <div key={pathname} className="fade-in">
             <Outlet />
           </div>
@@ -69,13 +69,13 @@ const Main = () => {
         {showScrollTop && (
           <motion.button
             key="scroll-to-top"
-            initial={{ opacity: 0, scale: 0.5 }}
-            animate={{ opacity: 1, scale: 1 }}
-            exit={{ opacity: 0, scale: 0.5 }}
+            initial={{ opacity: 0, scale: 0.5, y: 20 }}
+            animate={{ opacity: 1, scale: 1, y: 0 }}
+            exit={{ opacity: 0, scale: 0.5, y: 20 }}
             whileHover={{ scale: 1.1 }}
             whileTap={{ scale: 0.9 }}
             onClick={scrollToTop}
-            className="fixed bottom-8 right-8 z-[6000] flex items-center justify-center w-12 h-12 rounded-full bg-secondary text-white shadow-2xl"
+            className="fixed bottom-8 right-8 z-6000 flex items-center justify-center w-12 h-12 rounded-full bg-secondary text-white shadow-[0_10px_30px_rgba(5,150,105,0.4)] transition-shadow hover:shadow-secondary/50"
           >
             <FaChevronUp />
           </motion.button>

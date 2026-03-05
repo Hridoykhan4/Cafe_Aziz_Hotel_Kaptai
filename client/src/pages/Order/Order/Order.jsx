@@ -1,4 +1,4 @@
-import { Helmet } from "react-helmet-async";
+
 import { Tab, Tabs, TabList, TabPanel } from "react-tabs";
 import { useEffect, useMemo, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
@@ -62,9 +62,8 @@ const Order = () => {
 
   return (
     <section className="bg-base-100">
-      <Helmet>
-        <title>Cafe Aziz | Order</title>
-      </Helmet>
+      
+    
 
       {/* HERO */}
       <Cover

@@ -1,4 +1,4 @@
-import { Helmet } from "react-helmet-async";
+
 import useAuthValue from "../../../../hooks/useAuthValue";
 // eslint-disable-next-line no-unused-vars
 import { motion } from "framer-motion";
@@ -32,9 +32,7 @@ const UserHome = () => {
 
   return (
     <div>
-      <Helmet>
-        <title>Cafe Aziz | User Dashboard</title>
-      </Helmet>
+    
       <motion.div
         initial={{ opacity: 0, y: -20 }}
         animate={{ opacity: 1, y: 0 }}

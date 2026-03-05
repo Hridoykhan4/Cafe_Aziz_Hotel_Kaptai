@@ -1,4 +1,4 @@
-import { Helmet } from "react-helmet-async";
+
 // eslint-disable-next-line no-unused-vars
 import { motion } from "framer-motion";
 import Cover from "../../Shared/Cover/Cover";
@@ -58,10 +58,7 @@ const Menu = () => {
 
   return (
     <section className="bg-base-100">
-      <Helmet>
-        <title>Bistro | Menu</title>
-      </Helmet>
-
+    
       {/* HERO */}
       <Cover
         img={menuImg}

@@ -4,20 +4,47 @@ import tailwindcss from "@tailwindcss/vite";
 
 export default defineConfig({
   plugins: [react(), tailwindcss()],
+  server: {
+    port: 5173,
+    strictPort: false,
+  },
+  // This helps Vite handle the complex Firebase/Stripe structures during development
+  optimizeDeps: {
+    include: [
+      "firebase/app",
+      "firebase/auth",
+      "firebase/firestore",
+      "axios",
+      "@stripe/stripe-js",
+    ],
+  },
   build: {
+    target: "esnext",
+    minify: "terser",
+    terserOptions: {
+      compress: {
+        drop_console: true,
+        drop_debugger: true,
+      },
+    },
     rollupOptions: {
       output: {
+        // We use a function instead of an object to avoid the 'externalize' error
         manualChunks(id) {
           if (id.includes("node_modules")) {
-            if (id.includes("swiper") || id.includes("motion")) {
-              return "animations"; 
+            if (id.includes("firebase")) return "vendor-firebase";
+            if (id.includes("@stripe")) return "vendor-stripe";
+            if (
+              id.includes("react") ||
+              id.includes("react-dom") ||
+              id.includes("react-router")
+            ) {
+              return "vendor-react";
             }
-            if (id.includes("recharts")) {
-              return "charts";
+            if (id.includes("sweetalert2") || id.includes("framer-motion")) {
+              return "vendor-ui";
             }
-            if (id.includes("firebase") || id.includes("stripe")) {
-              return "firebase-stripe";
-            }
+            
             return "vendor";
           }
         },
