@@ -3,7 +3,7 @@ import errorImg from '../../assets/404.gif';
 
 const ErrorPage = () => {
   return (
-    <div className="flex flex-col items-center justify-center h-screen bg-gradient-to-b from-gray-50 to-gray-200 text-center px-4">
+    <div className="flex flex-col items-center justify-center h-screen bg-linear-to-b from-gray-50 to-gray-200 text-center px-4">
       {/* Error Image */}
       <img 
         src={errorImg} 

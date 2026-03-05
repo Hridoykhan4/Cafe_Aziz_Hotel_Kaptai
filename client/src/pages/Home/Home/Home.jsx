@@ -11,7 +11,7 @@ import LoadingSpinner from "../../../components/LoadingSpinner";
 const Home = () => {
   useScrollTo();
   return (
-    <section className="fade-in overflow-hidden">
+    <section className="fade-in relative overflow-hidden">
       <Banner></Banner>
       <div className="app-container">
         <Suspense fallback={<LoadingSpinner></LoadingSpinner>}>

@@ -344,15 +344,20 @@ const Dashboard = () => {
 
         {/* ── PAGE CONTENT ── */}
         <main className="flex-1 overflow-y-auto">
-          <motion.div
-            key={pathname}
-            initial={{ opacity: 0, y: 10 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.3, ease: [0.22, 1, 0.36, 1] }}
-            className="p-4 sm:p-6 lg:p-8 pb-24 lg:pb-8"
-          >
-            <Outlet />
-          </motion.div>
+          <AnimatePresence mode="wait">
+            {" "}
+            {/* Add mode="wait" to ensure old page leaves before new one enters */}
+            <motion.div
+              key={pathname}
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -10 }} // Add an exit animation
+              transition={{ duration: 0.2 }}
+              className="p-4 sm:p-6 lg:p-8 pb-24 lg:pb-8"
+            >
+              <Outlet />
+            </motion.div>
+          </AnimatePresence>
         </main>
       </div>
 

@@ -3,9 +3,11 @@ import { useState } from "react";
 import { FiShoppingCart, FiInfo } from "react-icons/fi";
 import useAuthValue from "../../hooks/useAuthValue";
 import Swal from "sweetalert2";
-import { useLocation, useNavigate } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import useAxiosSecure from "../../hooks/useAxiosSecure";
 import useCart from "../../hooks/useCart";
+import useAdmin from "../../hooks/useAdmin";
+import { MdFastfood } from "react-icons/md";
 
 const FoodCard = ({ item }) => {
   const axiosSecure = useAxiosSecure();
@@ -15,6 +17,7 @@ const FoodCard = ({ item }) => {
   const location = useLocation();
   const nav = useNavigate();
   const [imgErr, setImgErr] = useState(false);
+  const {isAdmin} = useAdmin()
 
   const handleAddToCart = async () => {
     if (!user?.email) {
@@ -122,13 +125,23 @@ const FoodCard = ({ item }) => {
         </div>
 
         {/* CTA */}
-        <button
-          onClick={handleAddToCart}
-          className="group/btn w-full inline-flex items-center justify-center gap-2 py-3 rounded-full border-2 border-secondary text-secondary font-black text-xs uppercase tracking-[0.18em] transition-all duration-300 hover:bg-secondary hover:text-white active:scale-95 shadow-sm hover:shadow-md hover:shadow-secondary/25"
-        >
-          <FiShoppingCart className="text-sm transition-transform duration-300 group-hover/btn:-translate-y-0.5" />
-          Add to Cart
-        </button>
+        {isAdmin ? (
+          <Link
+          to={`/dashboard/updateItems/${_id}`}
+            className="group/btn w-full inline-flex items-center justify-center gap-2 py-3 rounded-full border-2 border-secondary text-secondary font-black text-xs uppercase tracking-[0.18em] transition-all duration-300 hover:bg-secondary hover:text-white active:scale-95 shadow-sm hover:shadow-md hover:shadow-secondary/25"
+          >
+            <MdFastfood className="text-sm transition-transform duration-300 group-hover/btn:-translate-y-0.5" />
+            Update Item
+          </Link>
+        ) : (
+          <button
+            onClick={handleAddToCart}
+            className="group/btn w-full inline-flex items-center justify-center gap-2 py-3 rounded-full border-2 border-secondary text-secondary font-black text-xs uppercase tracking-[0.18em] transition-all duration-300 hover:bg-secondary hover:text-white active:scale-95 shadow-sm hover:shadow-md hover:shadow-secondary/25"
+          >
+            <FiShoppingCart className="text-sm transition-transform duration-300 group-hover/btn:-translate-y-0.5" />
+            Add to Cart
+          </button>
+        )}
       </div>
     </motion.div>
   );

@@ -76,7 +76,6 @@ const slides = [
 
 const INTERVAL = 6000;
 
-
 const Fallback = () => (
   <div className="absolute inset-0 bg-primary">
     <div
@@ -89,18 +88,17 @@ const Fallback = () => (
   </div>
 );
 
-
 const SlideImage = ({ src, accent }) => {
   const [loaded, setLoaded] = useState(false);
   const [errored, setErrored] = useState(false);
 
   return (
-    <div className="absolute inset-0">
+    <div className="relative overflow-hidden h-full w-full">
       {!errored ? (
         <>
           {!loaded && <Fallback />}
           <motion.img
-            key={src}
+            key={`img-${src}`}
             src={src}
             alt=""
             onLoad={() => setLoaded(true)}
@@ -108,7 +106,7 @@ const SlideImage = ({ src, accent }) => {
             initial={{ opacity: 0, scale: 1.08 }}
             animate={{ opacity: loaded ? 1 : 0, scale: loaded ? 1 : 1.08 }}
             transition={{ duration: 1.4, ease: [0.25, 0.46, 0.45, 0.94] }}
-            className="w-full h-full object-cover"
+            className="absolute inset-0 w-full h-full object-cover"
             draggable={false}
           />
         </>
@@ -116,11 +114,9 @@ const SlideImage = ({ src, accent }) => {
         <Fallback />
       )}
 
-      {/* gradient overlay */}
       <div
         className={`absolute inset-0 bg-linear-to-t ${accent} via-black/30 to-black/40`}
       />
-      {/* vignette */}
       <div
         className="absolute inset-0"
         style={{
@@ -132,9 +128,6 @@ const SlideImage = ({ src, accent }) => {
   );
 };
 
-/* ════════════════════════════════════════════
-   BANNER
-════════════════════════════════════════════ */
 const Banner = () => {
   const { user } = useAuthValue();
   const { isAdmin } = useAdmin();
@@ -152,7 +145,7 @@ const Banner = () => {
     if (paused) return;
     const t = setInterval(() => go(1), INTERVAL);
     return () => clearInterval(t);
-  }, [paused, go, index]);
+  }, [paused, go]);
 
   const slide = slides[index];
   const ctaPath = slide.cta.to(isAdmin, user);
@@ -163,10 +156,9 @@ const Banner = () => {
       onMouseEnter={() => setPaused(true)}
       onMouseLeave={() => setPaused(false)}
     >
-      {/* ── background ── */}
       <AnimatePresence mode="sync">
         <motion.div
-          key={index}
+          key={`bg-slide-${index}`}
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
@@ -177,7 +169,6 @@ const Banner = () => {
         </motion.div>
       </AnimatePresence>
 
-      {/* ── film grain ── */}
       <div
         className="absolute inset-0 opacity-5 pointer-events-none mix-blend-overlay"
         style={{
@@ -185,7 +176,6 @@ const Banner = () => {
         }}
       />
 
-      {/* ── content ── */}
       <div className="relative z-10 h-full flex items-end pb-16 md:pb-24 lg:items-center lg:pb-0">
         <div className="app-container w-full">
           <AnimatePresence mode="wait">
@@ -197,7 +187,6 @@ const Banner = () => {
               transition={{ duration: 0.6, ease: [0.25, 0.46, 0.45, 0.94] }}
               className="max-w-2xl"
             >
-              {/* eyebrow */}
               <motion.p
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
@@ -207,20 +196,19 @@ const Banner = () => {
                 {slide.eyebrow}
               </motion.p>
 
-              {/* headline */}
               <h1
                 className="text-white font-black leading-none text-5xl sm:text-6xl md:text-7xl lg:text-8xl tracking-tighter mb-4 md:mb-6"
                 style={{ fontFamily: "var(--font-heading)" }}
               >
-                {slide.headline.map((line, i) => (
+                {slide.headline.map((line, lIdx) => (
                   <motion.span
-                    key={i}
+                    key={`line-${index}-${lIdx}`}
                     initial={{ opacity: 0, x: -24 }}
                     animate={{ opacity: 1, x: 0 }}
-                    transition={{ duration: 0.55, delay: 0.2 + i * 0.12 }}
+                    transition={{ duration: 0.55, delay: 0.2 + lIdx * 0.12 }}
                     className="block"
                   >
-                    {i === 1 ? (
+                    {lIdx === 1 ? (
                       <span className="text-secondary">{line}</span>
                     ) : (
                       line
@@ -229,7 +217,6 @@ const Banner = () => {
                 ))}
               </h1>
 
-              {/* sub */}
               <motion.p
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
@@ -239,7 +226,6 @@ const Banner = () => {
                 {slide.sub}
               </motion.p>
 
-              {/* CTAs */}
               <motion.div
                 initial={{ opacity: 0, y: 10 }}
                 animate={{ opacity: 1, y: 0 }}
@@ -265,19 +251,17 @@ const Banner = () => {
         </div>
       </div>
 
-      {/* ── bottom controls ── */}
       <div className="absolute bottom-0 left-0 right-0 z-20 pb-6 md:pb-8">
         <div className="app-container flex items-center justify-between gap-6">
-          {/* dot indicators */}
           <div className="flex items-center gap-3">
-            {slides.map((_, i) => (
+            {slides.map((_, idx) => (
               <button
-                key={i}
-                onClick={() => setIndex(i)}
-                aria-label={`Slide ${i + 1}`}
+                key={`dot-${idx}`}
+                onClick={() => setIndex(idx)}
+                aria-label={`Slide ${idx + 1}`}
                 className={[
                   "rounded-full transition-all duration-300",
-                  i === index
+                  idx === index
                     ? "bg-secondary w-8 h-1.5"
                     : "bg-white/25 hover:bg-white/50 w-1.5 h-1.5",
                 ].join(" ")}
@@ -285,13 +269,11 @@ const Banner = () => {
             ))}
           </div>
 
-          {/* fraction */}
           <span className="text-white/35 text-xs font-black tracking-widest tabular-nums hidden sm:block">
             {String(index + 1).padStart(2, "0")} /{" "}
             {String(total).padStart(2, "0")}
           </span>
 
-          {/* arrows */}
           <div className="flex items-center gap-2">
             <button
               onClick={() => go(-1)}
@@ -310,7 +292,6 @@ const Banner = () => {
           </div>
         </div>
 
-        {/* progress — h-0.5 instead of h-[2px] */}
         <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-white/10">
           {!paused && (
             <motion.div
@@ -324,7 +305,6 @@ const Banner = () => {
         </div>
       </div>
 
-      {/* scroll hint */}
       <motion.div
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
