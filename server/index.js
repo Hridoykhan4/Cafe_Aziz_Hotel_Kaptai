@@ -20,16 +20,16 @@ const emailTransporter = nodemailer.createTransport({
 });
 
 // MiddleWare
-app.use(
-  cors({
-    origin: [
-      "http://localhost:5173",
-      "https://bistro-boss-restaurant-kaptai.web.app",
-      "https://bistro-boss-restaurant-kaptai.firebaseapp.com",
-    ],
-  })
-);
-// app.use(cors());
+// app.use(
+//   cors({
+//     origin: [
+//       "http://localhost:5173",
+//       "https://bistro-boss-restaurant-kaptai.web.app",
+//       "https://bistro-boss-restaurant-kaptai.firebaseapp.com",
+//     ],
+//   })
+// );
+app.use(cors());
 app.use(express.json());
 
 /* -----Custom Middlewares Start */
@@ -86,6 +86,21 @@ async function run() {
     const cartCollection = client.db("bistroDB").collection("carts");
     const paymentCollection = client.db("bistroDB").collection("payments");
     const bookingCollection = client.db("bistroDB").collection("bookings");
+
+    app.get("/health", async (req, res) => {
+      try {
+        await db.command({ ping: 1 });
+
+        res.status(200).json({
+          status: "Alive",
+          database: "Connected to Cafe Aziz",
+          timestamp: new Date().toISOString(),
+        });
+      } catch (error) {
+        res.status(500).json({ status: "Error", message: error.message });
+      }
+    });
+
     /* ______________------JWT------____________ */
 
     app.post("/jwt", (req, res) => {
@@ -113,7 +128,7 @@ async function run() {
       verifyAdmin,
       asyncHandler(async (req, res) => {
         res.send(await userCollection.find().toArray());
-      })
+      }),
     );
 
     app.post(
@@ -129,7 +144,7 @@ async function run() {
         }
         const result = await userCollection.insertOne(user);
         res.send(result);
-      })
+      }),
     );
 
     app.patch(
@@ -140,10 +155,10 @@ async function run() {
         res.send(
           await userCollection.updateOne(
             { _id: new ObjectId(req.params.id) },
-            { $set: { role: "admin" } }
-          )
+            { $set: { role: "admin" } },
+          ),
         );
-      }
+      },
     );
 
     app.delete(
@@ -151,9 +166,9 @@ async function run() {
       verifyToken,
       asyncHandler(async (req, res) => {
         res.send(
-          await userCollection.deleteOne({ _id: new ObjectId(req.params.id) })
+          await userCollection.deleteOne({ _id: new ObjectId(req.params.id) }),
         );
-      })
+      }),
     );
 
     /**
@@ -187,12 +202,12 @@ async function run() {
         }
         const allItems = await menuCollection.find().toArray();
         res.send({ items: allItems });
-      })
+      }),
     );
 
     app.get("/menu/:id", async (req, res) => {
       res.send(
-        await menuCollection.findOne({ _id: new ObjectId(req.params.id) })
+        await menuCollection.findOne({ _id: new ObjectId(req.params.id) }),
       );
     });
 
@@ -203,7 +218,7 @@ async function run() {
       verifyAdmin,
       asyncHandler(async (req, res) => {
         res.send(await menuCollection.insertOne(req.body));
-      })
+      }),
     );
 
     app.patch(
@@ -215,16 +230,16 @@ async function run() {
         res.send(
           await menuCollection.updateOne(
             { _id: new ObjectId(req.params.id) },
-            { $set: rest }
-          )
+            { $set: rest },
+          ),
         );
-      })
+      }),
     );
 
     app.delete("/menu/:id", verifyToken, verifyAdmin, async (req, res) => {
       await cartCollection.deleteMany({ menuId: req.params.id });
       res.send(
-        await menuCollection.deleteOne({ _id: new ObjectId(req.params.id) })
+        await menuCollection.deleteOne({ _id: new ObjectId(req.params.id) }),
       );
     });
 
@@ -236,7 +251,7 @@ async function run() {
       "/reviews",
       asyncHandler(async (req, res) => {
         res.send(await reviewCollection.find().toArray());
-      })
+      }),
     );
 
     app.post("/reviews", verifyToken, async (req, res) => {
@@ -268,7 +283,7 @@ async function run() {
         const query = { email };
         const result = await cartCollection.find(query).toArray();
         res.send(result);
-      })
+      }),
     );
 
     /* Delete an item */
@@ -341,10 +356,10 @@ async function run() {
         res.send(
           await paymentCollection.updateOne(
             { _id: new ObjectId(req.params.id) },
-            { $set: { status } }
-          )
+            { $set: { status } },
+          ),
         );
-      }
+      },
     );
 
     app.get("/payments", verifyToken, async (req, res) => {
