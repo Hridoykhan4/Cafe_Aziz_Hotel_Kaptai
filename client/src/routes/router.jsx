@@ -8,6 +8,7 @@ import AdminRoute from "./AdminRoute";
 import ErrorPage from "../pages/ErrorPage/ErrorPage";
 import LoadingSpinner from "../components/LoadingSpinner";
 import UserRoute from "./UserRoute";
+import Order from "../pages/Order/Order/Order";
 
 // --- Higher Order Component for Lazy Loading ---
 // eslint-disable-next-line react-refresh/only-export-components, no-unused-vars
@@ -20,7 +21,6 @@ const Loadable = (Component) => (props) => (
 // --- Lazy Loaded Pages ---
 const Home = Loadable(lazy(() => import("../pages/Home/Home/Home")));
 const Menu = Loadable(lazy(() => import("../pages/Menu/Menu/Menu")));
-const Order = Loadable(lazy(() => import("../pages/Order/Order/Order")));
 const Contact = Loadable(
   lazy(() => import("../pages/Contact/Contact/Contact")),
 );

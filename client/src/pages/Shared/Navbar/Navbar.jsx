@@ -25,7 +25,34 @@ import useAuthValue from "../../../hooks/useAuthValue";
 import useCart from "../../../hooks/useCart";
 import useAdmin from "../../../hooks/useAdmin";
 
-/* ── nav configs ── */
+/* ═══════════════════════════════════════════════════════════════════
+   ROOT CAUSE FIXED — NAVBAR TURNS WHITE ON /order, /menu, /contact
+   ──────────────────────────────────────────────────────────────────
+   Old solidNav logic:
+     const solidNav = scrolled || pathname.startsWith("/dashboard") || isAuthPage
+
+   On /order/salad:
+     - scrolled = false (top of page on load)
+     - not /dashboard
+     - not /login or /signup
+   → solidNav = FALSE → bg-transparent navbar
+   → All navbar text is white (text-white/70)
+   → Page background is white (bg-base-100)
+   → White text on white background = invisible navbar
+
+   THE FIX:
+   The glass/transparent navbar should ONLY appear on the HOME PAGE ("/")
+   where the hero banner provides a dark background behind it.
+   Every other page has a white background — it needs the solid dark navbar.
+
+   New logic:
+     const solidNav = pathname !== "/" || scrolled
+   
+   Translation: "Be solid everywhere EXCEPT the home page at scroll=0"
+   On home page: transparent until user scrolls → classic hero effect
+   On ALL other pages: always solid dark from the start
+═══════════════════════════════════════════════════════════════════ */
+
 const publicLinks = [
   { to: "/", label: "Home", Icon: FaHome },
   { to: "/menu", label: "Menu", Icon: FaUtensils },
@@ -109,7 +136,6 @@ const MLink = ({ to, label, Icon, onClick }) => (
   </NavLink>
 );
 
-/* ── section label ── */
 const SLabel = ({ children }) => (
   <p className="px-4 pt-5 pb-1.5 text-[9px] uppercase tracking-[0.38em] text-white/18 font-black">
     {children}
@@ -130,12 +156,15 @@ const Navbar = () => {
   const cartCount = cart?.length || 0;
   const dashLinks = isAdmin ? adminLinks : customerLinks;
 
+  // [FIX] Scroll listener
   useEffect(() => {
-    const fn = () => setScrolled(window.scrollY > 20); 
+    const fn = () => setScrolled(window.scrollY > 20);
     window.addEventListener("scroll", fn, { passive: true });
+    fn(); // run on mount so SSR/hydration gets correct value immediately
     return () => window.removeEventListener("scroll", fn);
   }, []);
 
+  // Outside-click handler for dropdown
   useEffect(() => {
     const fn = (e) => {
       if (dropdownRef.current && !dropdownRef.current.contains(e.target))
@@ -145,13 +174,20 @@ const Navbar = () => {
     return () => document.removeEventListener("mousedown", fn);
   }, []);
 
+  // [FIX] Dispatch to Main.jsx which locks BOTH html + body
+  // Locking only body leaves scrollbar-gutter = ghost scrollbar
   useEffect(() => {
-    document.body.style.overflow = drawerOpen ? "hidden" : "";
+    window.dispatchEvent(
+      new CustomEvent("drawer-state", { detail: { locked: drawerOpen } }),
+    );
     return () => {
-      document.body.style.overflow = "";
+      window.dispatchEvent(
+        new CustomEvent("drawer-state", { detail: { locked: false } }),
+      );
     };
   }, [drawerOpen]);
 
+  // Close drawer on route change
   useEffect(() => {
     setDrawerOpen(false);
   }, [pathname]);
@@ -181,20 +217,23 @@ const Navbar = () => {
     }
   };
 
-  const isAuthPage = pathname === "/login" || pathname === "/signup";
-  const solidNav = scrolled || pathname.startsWith("/dashboard") || isAuthPage;
+  // [CORE FIX] Transparent ONLY on home page at scroll=0
+  // Every other page always gets the solid dark navbar
+  const solidNav = pathname !== "/" || scrolled;
 
   return (
     <>
       <nav
         className={[
-          "w-full fixed top-0 left-0 right-0 z-100000 transition-all duration-500 ease-in-out",
+          "w-full fixed top-0 left-0 right-0 transition-all duration-500 ease-in-out",
           solidNav
-            ? "bg-primary/96 backdrop-blur-xl py-3 shadow-[0_8px_30px_rgba(0,0,0,0.4)] border-b border-white/5"
+            ? "bg-primary/97 backdrop-blur-xl py-3 shadow-[0_4px_30px_rgba(0,0,0,0.35)] border-b border-white/5"
             : "bg-transparent py-5",
         ].join(" ")}
+        style={{ zIndex: 50000 }}
       >
         <div className="app-container flex items-center justify-between">
+          {/* Brand */}
           <Link to="/" className="group flex flex-col leading-none select-none">
             <span className="text-[1.6rem] font-black tracking-tight text-secondary transition-all duration-300 group-hover:tracking-wider">
               CAFE AZIZ
@@ -204,6 +243,7 @@ const Navbar = () => {
             </span>
           </Link>
 
+          {/* Desktop nav links */}
           <ul className="hidden lg:flex items-center gap-7 list-none m-0 p-0">
             {publicLinks.map(({ to, label }) => (
               <li key={to}>
@@ -232,6 +272,7 @@ const Navbar = () => {
             )}
           </ul>
 
+          {/* Desktop right — avatar / sign in */}
           <div className="hidden lg:flex items-center">
             {user ? (
               <div className="relative" ref={dropdownRef}>
@@ -279,7 +320,8 @@ const Navbar = () => {
                       animate={{ opacity: 1, y: 0, scale: 1 }}
                       exit={{ opacity: 0, y: 8, scale: 0.97 }}
                       transition={{ duration: 0.14 }}
-                      className="absolute right-0 mt-3 w-64 bg-white rounded-2xl shadow-[0_20px_60px_rgba(0,0,0,0.16)] border border-slate-100 overflow-hidden z-50"
+                      className="absolute right-0 mt-3 w-64 bg-white rounded-2xl shadow-[0_20px_60px_rgba(0,0,0,0.16)] border border-slate-100 overflow-hidden"
+                      style={{ zIndex: 60000 }}
                     >
                       <div className="px-4 py-3.5 bg-linear-to-br from-slate-50 to-white border-b border-slate-100">
                         <p className="text-sm font-bold text-slate-800 truncate">
@@ -344,9 +386,11 @@ const Navbar = () => {
             )}
           </div>
 
+          {/* Mobile hamburger */}
           <button
             onClick={() => setDrawerOpen(true)}
             className="lg:hidden flex items-center justify-center w-10 h-10 rounded-xl text-white/70 hover:text-secondary hover:bg-white/5 transition-all active:scale-90"
+            aria-label="Open menu"
           >
             <FaBars className="text-xl" />
           </button>
@@ -363,7 +407,8 @@ const Navbar = () => {
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
               onClick={closeDrawer}
-              className="fixed inset-0 bg-black/80 backdrop-blur-sm z-100001"
+              className="fixed inset-0 bg-black/80 backdrop-blur-sm"
+              style={{ zIndex: 60001 }}
             />
             <motion.aside
               key="panel"
@@ -371,8 +416,10 @@ const Navbar = () => {
               animate={{ x: 0 }}
               exit={{ x: "100%" }}
               transition={{ type: "spring", stiffness: 300, damping: 30 }}
-              className="fixed top-0 right-0 h-dvh w-75 bg-primary flex flex-col z-100002 shadow-[-30px_0_80px_rgba(0,0,0,0.55)]"
+              className="fixed top-0 right-0 h-dvh w-72 bg-primary flex flex-col shadow-[-30px_0_80px_rgba(0,0,0,0.55)]"
+              style={{ zIndex: 60002 }}
             >
+              {/* Header */}
               <div className="flex items-center justify-between px-6 pt-7 pb-5 border-b border-white/[0.07] shrink-0">
                 <div>
                   <p className="text-secondary font-black tracking-tighter text-lg leading-none">
@@ -390,6 +437,7 @@ const Navbar = () => {
                 </button>
               </div>
 
+              {/* Nav links */}
               <div
                 className="flex-1 overflow-y-auto py-2"
                 style={{ scrollbarWidth: "none" }}
@@ -440,6 +488,7 @@ const Navbar = () => {
                 )}
               </div>
 
+              {/* Footer */}
               <div className="px-5 pb-8 pt-4 border-t border-white/[0.07] shrink-0 space-y-3">
                 {user ? (
                   <>
