@@ -12,7 +12,6 @@ import GoogleLoginButton from "../../components/Auth/GoogleLoginButton";
 
 const Login = () => {
   useScrollTo();
-  const [verified, setVerified] = useState(false);
   const [loading, setLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   
@@ -110,12 +109,13 @@ const Login = () => {
                   type="email"
                   name="email"
                   placeholder="e.g. chef@aziz.com"
-                  className="input bg-base-200/40 border-none focus:ring-2 focus:ring-secondary/20 rounded-2xl transition-all h-14 px-6 font-medium"
+                  className="input bg-base-200/40 w-full border-none focus:ring-2 focus:ring-secondary/20 rounded-2xl transition-all h-14 px-6 font-medium"
                   required
                 />
               </div>
 
               <div className="form-control">
+                <label className="label-text font-black text-[11px] mb-2 tracking-widest text-primary/50">PASSWORD</label>
                 <div className="relative">
                   <input
                     type={showPassword ? "text" : "password"}
@@ -135,18 +135,18 @@ const Login = () => {
               </div>
 
               {/* Verified ReCAPTCHA Container */}
-              <div className="flex flex-col items-center py-2">
+              {/* <div className="flex flex-col items-center py-2">
                 <div className="scale-90 md:scale-100 origin-center">
                   <ReCAPTCHA
                     sitekey={import.meta.env.VITE_Recaptcha_Site_key}
                     onChange={(t) => setVerified(!!t)}
                   />
                 </div>
-              </div>
+              </div> */}
 
               <button
                 type="submit"
-                disabled={!verified || loading}
+                disabled={loading}
                 className="btn btn-primary w-full h-16 rounded-2xl text-white font-black tracking-[0.2em] shadow-xl shadow-primary/20 hover:shadow-primary/40 transition-all active:scale-[0.98] border-none"
               >
                 {loading ? (
