@@ -4,7 +4,7 @@ import MenuItem from "../../Shared/MenuItem/MenuItem";
 
 const MenuCategory = ({ items, title, desc, coverImage }) => {
   return (
-    <div className="w-full">
+    <div className="w-full overflow-x-hidden">
       {/* 1. Header Cover (Optional) */}
       {title && (
         <div className="mb-16">

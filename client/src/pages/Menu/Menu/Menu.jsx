@@ -75,7 +75,7 @@ const Menu = () => {
       </div>
 
       {/* ── CATEGORY SECTIONS ── */}
-      <div className="space-y-24">
+      <div className="section-spacing">
         {categories.map(({ key, title, desc, coverImage }) => (
           <motion.div
             key={key}
