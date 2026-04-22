@@ -9,15 +9,15 @@ const stripe = require("stripe")(process.env.STRIPE_SECRET_KEY);
 let userCollection;
 const asyncHandler = require("./asyncHandler");
 const errorHandler = require("./errorHandler");
-const nodemailer = require("nodemailer");
+// const nodemailer = require("nodemailer");
 
-const emailTransporter = nodemailer.createTransport({
-  service: "gmail",
-  auth: {
-    user: process.env.CAFE_AZIZ_EMAIL,
-    pass: process.env.CAFE_AZIZ_EMAIL_PASS,
-  },
-});
+// const emailTransporter = nodemailer.createTransport({
+//   service: "gmail",
+//   auth: {
+//     user: process.env.CAFE_AZIZ_EMAIL,
+//     pass: process.env.CAFE_AZIZ_EMAIL_PASS,
+//   },
+// });
 
 // MiddleWare
 // app.use(
